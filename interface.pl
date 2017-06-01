@@ -21,7 +21,6 @@ start(0) :-
     Player == 1 -> play(B, LVL, Player);
     Player == 2 -> playIA(B, LVL, Player);
     .
-
 start(1) :- 
     writeln('Niveau de difficulté de l'IA 1 :'),
     level(LVL1),
@@ -29,7 +28,6 @@ start(1) :-
     level(LVL2),
     init_board(B),
     playIAvsIA(B, LVL1, LVL2).
-
 start(_) :- !.
 
 % Demande la difficulté de l'IA au joueur
@@ -40,7 +38,6 @@ level(LVL) :-
     read(LVL),
     integer(LVL),
     between(0, 2, LVL), !.
-
 level(LVL) :-
     writeln('Le choix doit être 0, 1 ou 2 !'),
     level(LVL).
@@ -53,7 +50,6 @@ is_first(Player) :-
     read(Player),
     integer(Player),
     between(1, 2, Player), !.
-   
 is_first(Player) :-
     writeln('Le choix doit être 1 ou 2 !'),
     is_first(
@@ -72,7 +68,7 @@ playIA(B, LVL, Player) :-
     board(B1),
     Depth is LVL + 3,
     alpha_beta(Player, Depth, B1, -10000, 10000, Move, B, Value), !,
-    save(Player, Move),
+²²²    save(Player, Move),
     board(NewB),
     print_board(Player, LVL, NewB),
     not(won)
@@ -98,6 +94,40 @@ playIAvsIA(LVL1, LVL2, Depth1, Depth2, P1, P2) :-
     not(won),
     playIAvsIA(LVL1, LVL2, Depth1, Depth2, B, NewB).
   
+choice_action(B, Move, Player) :-
+    writeln('Choisissez une action :'),
+    writeln('\t0. Poser un pion'),
+    writeln('\t1. Déplacer un pion'),
+    writeln('\t2. Déplacer la case vide'),
+    scan_choice(C),
+    C == 0 -> C1 is -1, scan_destination(C2);
+    C == 2 -> scan_origine(C1), scan_destination(C2), is_move_allowed(C2, C1, C); % to do : get_empty_tile(C1)
+    scan_origine(C1), scan_destination(C2), nth0(C1, PL, JR), !.
+    
+    
+scan_choice(C) :-
+    read(C),
+    integer(C),
+    between(0, 3, ID), !.  
+scan_choice(C) :-
+    writeln('Le choix doit être 0, 1 ou 2 !'),
+    scan_choice(C).
+
+scan_origine(C) :-
+    writeln('Emplactement d'origine :'),
+    read(C),
+    integer(C),
+    between(0, 8, C), !.
+scan_origine(C) :-
+    writeln('Le choix doit être entre 0 et 8 inclus !'),
+    scan_choice(C).
+
+scan_destination(C) :-
+    writeln('Destination :'),
+    read(C),
+    integer(C),
+    between(0, 8, C), !.
+
 won :-
     board(B),
     win(PLayer, B),
