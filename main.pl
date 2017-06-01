@@ -8,6 +8,7 @@ main :-
   writeln('2 - Quitter'),
   choix(C),
   tty_clear,
+  start(C),
   
   % Lance le menu
 :- set_prolog_stack(global, limit(2*10**9)), main.
