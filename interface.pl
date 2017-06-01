@@ -68,10 +68,10 @@ play(B, LVL, Player) :-
     get_opponent(Player, Opponent),
     playIA(B, LVL, Opponent).
   
-PlayIA(B, LVL, Player) :-
+playIA(B, LVL, Player) :-
     board(B1),
     Depth is LVL + 3,
-    alpha_beta(Player, Depth, B1, -10000, 10000, Move, B, Value),
+    alpha_beta(Player, Depth, B1, -10000, 10000, Move, B, Value), !,
     save(Player, Move),
     board(NewB),
     print_board(Player, LVL, NewB),
@@ -79,6 +79,24 @@ PlayIA(B, LVL, Player) :-
     get_opponent(Player, Opponent),
     play(B1, LVL, Opponent).
     
+playIAvsIA(LVL1, LVL2) :-
+    Depth1 is LVL1 + 3,
+    Depth2 is LVL2 + 3,
+    playIAvsIA(LVL1, LVL2, Depth1, Depth2, [-1], [-1]), % à revoir
+    
+playIAvsIA(LVL1, LVL2, Depth1, Depth2, P1, P2) :-
+    board(B),
+    alpha_beta(1, Depth1, B, -10000, 10000, Move, P1, Value), !,
+    save(1, Move),
+    board(NewB),
+    print_board(1, LVL1, NewB),
+    not(won),
+    alpha_beta(2, Depth2, NewB, -10000, 10000, Move2, P2, Value), !,
+    save(2, Move2),
+    board(NewB2),
+    print_board(2, LVL2, NewB2),
+    not(won),
+    playIAvsIA(LVL1, LVL2, Depth1, Depth2, B, NewB).
   
 won :-
     board(B),
