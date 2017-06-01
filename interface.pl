@@ -60,17 +60,24 @@ is_first(Player) :-
 
 play(B, LVL, Player) :-
     board(B),
-    choice_action(B, Coup, Player),
-    save(Player, Coup),
+    choice_action(B, Move, Player),
+    save(Player, Move),
     board(NewB),
     print_board(Player, LVL, NewB),
     not(won),
     get_opponent(Player, Opponent),
     playIA(B, LVL, Opponent).
   
-PlayIA(B, LVL, Opponent) :-
-    board(B),
+PlayIA(B, LVL, Player) :-
+    board(B1),
     Depth is LVL + 3,
+    alpha_beta(Player, Depth, B1, -10000, 10000, Move, B, Value),
+    save(Player, Move),
+    board(NewB),
+    print_board(Player, LVL, NewB),
+    not(won)
+    get_opponent(Player, Opponent),
+    play(B1, LVL, Opponent).
     
   
 won :-
