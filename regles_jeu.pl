@@ -107,14 +107,14 @@ move(_, B, [TS, TE, 3], NewB) :-
 
 %pour pose de pion
 setP(Plr, [0|R], 0) :- numP(Plr, [0|R], N), N<3.
-setP(Plr, [T0, 0|R], 0) :- numP(Plr, [T0, 0|R], N), N<3.
-setP(Plr, [T0, T1, 0|R], 0) :- numP(Plr, [T0, T1, 0|R], N), N<3.
-setP(Plr, [T0, T1, T2, 0|R], 0) :- numP(Plr, [T0, T1, T2, 0|R], N), N<3.
-setP(Plr, [T0, T1, T2, T3, 0|R], 0) :- numP(Plr, [T0, T1, T2, T3, 0|R], N), N<3.
-setP(Plr, [T0, T1, T2, T3, T4, 0|R], 0) :- numP(Plr, [T0, T1, T2, T3, T4, 0|R], N), N<3.
-setP(Plr, [T0, T1, T2, T3, T4, T5, 0|R], 0) :- numP(Plr, [T0, T1, T2, T3, T4, T5, 0|R], N), N<3.
-setP(Plr, [T0, T1, T2, T3, T4, T5, T6, 0|R], 0) :- numP(Plr, [T0, T1, T2, T3, T4, T5, T6, 0|R], N), N<3.
-setP(Plr, [T0, T1, T2, T3, T4, T5, T6, T7, 0|R], 0) :- numP(Plr, [T0, T1, T2, T3, T4, T5, T6, T7, 0|R], N), N<3.
+setP(Plr, [T0, 0|R], 1) :- numP(Plr, [T0, 0|R], N), N<3.
+setP(Plr, [T0, T1, 0|R], 2) :- numP(Plr, [T0, T1, 0|R], N), N<3.
+setP(Plr, [T0, T1, T2, 0|R], 3) :- numP(Plr, [T0, T1, T2, 0|R], N), N<3.
+setP(Plr, [T0, T1, T2, T3, 0|R], 4) :- numP(Plr, [T0, T1, T2, T3, 0|R], N), N<3.
+setP(Plr, [T0, T1, T2, T3, T4, 0|R], 5) :- numP(Plr, [T0, T1, T2, T3, T4, 0|R], N), N<3.
+setP(Plr, [T0, T1, T2, T3, T4, T5, 0|R], 6) :- numP(Plr, [T0, T1, T2, T3, T4, T5, 0|R], N), N<3.
+setP(Plr, [T0, T1, T2, T3, T4, T5, T6, 0|R], 7) :- numP(Plr, [T0, T1, T2, T3, T4, T5, T6, 0|R], N), N<3.
+setP(Plr, [T0, T1, T2, T3, T4, T5, T6, T7, 0|R], 8) :- numP(Plr, [T0, T1, T2, T3, T4, T5, T6, T7, 0|R], N), N<3.
 
   
 %pour déplacement de pion  
