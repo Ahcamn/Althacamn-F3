@@ -1,4 +1,4 @@
-:- module(mod_interface, [init_ui/0, scan_choice/2, start/1]).
+:- module(mod_interface, [init_board/0, init_ui/0, scan_choice/2, start/1]).
 :- use_module('regles_jeu.pl').
 :- use_module('ia.pl').
 
