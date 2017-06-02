@@ -1,4 +1,4 @@
-:- module(mod_interface, [init_ui/0]).
+:- module(mod_interface, [init_ui/0, scan_choice/2]).
 :- use_module('regles_jeu.pl').
 
 % Permet de sauvegarder le board
@@ -115,7 +115,7 @@ choice_action(B, Move, Player) :-
 scan_choice(C) :-
     read(C),
     integer(C),
-    between(0, 3, ID), !.  
+    between(0, 2, C), !.  
 scan_choice(C) :-
     writeln('Erreur : Le choix doit être 0, 1 ou 2 !'),
     scan_choice(C).
