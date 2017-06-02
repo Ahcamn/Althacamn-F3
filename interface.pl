@@ -113,7 +113,7 @@ choice_action(B, [C1, C2, C], Player) :-
     C == 2 -> scan_origine(C1), scan_destination(C2), is_move_allowed(C2, C1, C);
     scan_origine(C1), scan_destination(C2), nth0(C1, B, Player), !.
 choice_action(B, [C1, C2, C], Player) :-
-    writeln("Erreur : action impossible !"),
+    writeln('Erreur : action impossible !'),
     choice_action(B, [C1, C2, C], Player).
     
 % Demande au joueur de choisir une action
