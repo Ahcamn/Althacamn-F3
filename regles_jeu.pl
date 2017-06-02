@@ -1,3 +1,8 @@
+% TO DO :
+% - row
+% - column
+% - diagonal
+
 :- module(mod_regles_jeu, [win/2, numP/3, move/3, setP/3, get_opponent/2]).
 
 %Conditions de victoires
