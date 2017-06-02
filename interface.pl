@@ -50,7 +50,7 @@ level(LVL) :-
   
 % Demande au joueur si il veut commencer en 1er le jeu
 is_first(Player) :-
-    writeln('Voulez-vous commencer en 1er ?'),
+    nl, writeln('Voulez-vous commencer en 1er ?'),
     writeln('\t1. Oui'),
     writeln('\t2. Non'),
     read(Player),
@@ -104,7 +104,7 @@ playIAvsIA(LVL1, LVL2, Depth1, Depth2, P1, P2) :-
   
 % Permet de définir un coup
 choice_action(B, [C1, C2, C], Player) :-
-    writeln('Choisissez une action :'),
+    nl, writeln('Choisissez une action :'),
     writeln('\t0. Poser un pion'),
     writeln('\t1. Déplacer un pion'),
     writeln('\t2. Déplacer la case vide'),
@@ -127,7 +127,7 @@ scan_choice(C) :-
     
 % Demande au joueur de choisir l'emplacement d'origine
 scan_origine(C) :-
-    writeln("Emplactement d'origine :"),
+    nl, writeln("Emplactement d'origine :"),
     read(C),
     integer(C),
     between(0, 8, C), !.
@@ -137,7 +137,7 @@ scan_origine(C) :-
 
 % Demande au joueur de choisir la destination
 scan_destination(C) :-
-    writeln('Destination :'),
+    nl, writeln('Destination :'),
     read(C),
     integer(C),
     between(0, 8, C), !.
