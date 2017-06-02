@@ -33,7 +33,7 @@ start(1) :-
     writeln("Niveau de difficulté de l'IA 2 :"),
     level(LVL2),
     init_board(B),
-    playIAvsIA(B, LVL1, LVL2).
+    playIAvsIA(LVL1, LVL2).
 start(_) :- !.
 
 % Demande la difficulté de l'IA au joueur
