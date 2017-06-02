@@ -151,6 +151,11 @@ won :-
     win(Player, B),
     writef("Le joueur %w a gagné !", [Player]),
     init_ui, !.
+   
+save(Player,Move) :-
+    retract(board(B)),
+    move(Player,B,Move,B1),
+    assert(board(B1)).
     
 % Permet de savoir si le déplacement de case choisi est possible
 is_move_allowed(0, C, 2) :-
