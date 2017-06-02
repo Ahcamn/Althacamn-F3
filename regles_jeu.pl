@@ -1,4 +1,4 @@
-:- module(mod_regles_jeu, [win/2, numP/3,  move/3]).
+:- module(mod_regles_jeu, [win/2, numP/3, move/3, setP/3]).
 
 %Conditions de victoires
 %3 pions sur une ligne
