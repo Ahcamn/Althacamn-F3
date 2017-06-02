@@ -1,5 +1,6 @@
-:- module(mod_interface, [init_ui/0, scan_choice/2]).
+:- module(mod_interface, [init_ui/0, scan_choice/2, start/1]).
 :- use_module('regles_jeu.pl').
+:- use_module('ia.pl').
 
 % Permet de sauvegarder le board
 :- dynamic board/1.
