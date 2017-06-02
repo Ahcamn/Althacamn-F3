@@ -1,3 +1,6 @@
+% TO DO :
+% - Crédits
+
 :- use_module('interface.pl').
 
 % Menu de sélection
