@@ -7,9 +7,9 @@
 main :-
   init_ui,
   writeln('----------- Menu ------------'),
-  writeln('0 - Joueur Vs. IA'),
-  writeln('1 - IA Vs. IA'),
-  writeln('2 - Quitter'),
+  writeln('\t0 - Joueur Vs. IA'),
+  writeln('\t1 - IA Vs. IA'),
+  writeln('\t2 - Quitter'),
   scan_choice(C),
   tty_clear,
   start(C).
