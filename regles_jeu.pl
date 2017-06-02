@@ -64,7 +64,7 @@ empty2(8, 6, 7).
 %Modification de l'élément voulu du plateau
 modifyBoard(Val, 0, [_|R], [Val|R]) :- !.
 modifyBoard(Val, I, [X|R1], [X|R2]) :-
-  I > 0, I is I-1, modifyBoard(Val, I, R1, R2), !.
+    I > 0, I is I-1, modifyBoard(Val, I, R1, R2), !.
 
 
 %nombre de pions placés pas le joueur Plr
@@ -73,9 +73,9 @@ numP(Plr, B, N) :- sublist(=(Plr), B, L), length(L, N).
 
 % Poser un pion (max 3)
 move(Plr, B, [-1, T, 0], NewB) :-
-  %garde-fou ici ou dans setP (ou pas du tout)?
-  setP(Plr, B, T),
-  modifyBoard(Plr, T, B, NewB).
+    %garde-fou ici ou dans setP (ou pas du tout)?
+    setP(Plr, B, T),
+    modifyBoard(Plr, T, B, NewB).
 
 %pour pose de pion
 setP(Plr, [0|R], 0) :- numP(Plr, [0|R], N), N<3.
@@ -91,35 +91,60 @@ setP(Plr, [T0, T1, T2, T3, T4, T5, T6, T7, 0|R], 0) :- numP(Plr, [T0, T1, T2, T3
 
 % Déplacer un pion (TE = case d'arrivé, TS = case de départ)
 move(Plr, B, [TS, TE, 1], NewB) :-
-  %garde-fou ici ou dans moveP (ou pas du tout)?
-  moveP(Plr, B, [TS, TE]),
-  modifyBoard(0, TS, B, Temp),
-  modifyBoard(Plr, TE, Temp, NewB).
+    %garde-fou ici ou dans moveP (ou pas du tout)?
+    moveP(Plr, B, [TS, TE]),
+    modifyBoard(0, TS, B, Temp),
+    modifyBoard(Plr, TE, Temp, NewB).
   
 %pour déplacement de pion  
 moveP(Plr, B, [TS, TE]) :-
-  !,
-  nth0(TS, B, Plr), 
-  nth0(TE, B, 0).
+    !,
+    nth0(TS, B, Plr), 
+    nth0(TE, B, 0).
 
 % Déplacer une case
 move(_, B, [TS, TE, 2], NewB) :-
-  %garde-fou ici ou dans moveT (ou pas du tout)?
-  moveT(B, [TS, TE]),
-  modifyBoard(-1, TE, B, Temp),
-  nth0(TE, B, Val),
-  modifyBoard(Val, TS, Temp, NewB).
+    %garde-fou ici ou dans moveT (ou pas du tout)?
+    moveT(B, [TS, TE]),
+    modifyBoard(-1, TE, B, Temp),
+    nth0(TE, B, Val),
+    modifyBoard(Val, TS, Temp, NewB).
 
 %pour déplacement de case
 moveT(B, [TS, TE]) :-
-  !, empty(TS, TE), nth0(TS, B, -1).
+    !, empty(TS, TE), nth0(TS, B, -1).
 
 % Déplacer deux cases
 move(_, B, [TS, TE, 3], NewB) :-
-  %garde-fou?
-  empty2(TS, TE, TI),
-  move(_, B, [TS, TI, 2], Temp1),
-  move(_, Temp1, [TI, TE, 2], NewB).
+    %garde-fou?
+    empty2(TS, TE, TI),
+    move(_, B, [TS, TI, 2], Temp1),
+    move(_, Temp1, [TI, TE, 2], NewB).
 
 get_opponent(1, 2) :- !.
 get_opponent(2, 1).
+
+% ----------------- à refaire ------------------
+
+% Unifie la séquence [E1, E2, E3] avec la Ième ligne du plateau PL
+row(PL, I, [E1, E2, E3]) :-
+    I1 is (I - 1) * 3, nth0(I1, PL, E1),
+    I2 is 3 * I - 2, nth0(I2, PL, E2),
+    I3 is 3 * I - 1, nth0(I3, PL, E3).
+
+% Unifie la séquence [E1, E2, E3] avec la Jème colonne du plateau PL
+column(PL, J, [E1, E2, E3]) :-
+    nth1(J, PL, E1),
+    I2 is J + 3, nth1(I2, PL, E2),
+    I3 is J + 6, nth1(I3, PL, E3).
+
+% Unifie la séquence [E1, E2, E3] avec la Nème diagonale du plateau PL
+diagonal(PL, 1, [E1,E2,E3]) :-
+    !, nth1(1, PL, E1),
+    nth1(5, PL, E2),
+    nth1(9, PL, E3).
+
+diagonal(PL, 2, [E1,E2,E3]) :-
+    nth1(3, PL, E1),
+    nth1(5, PL, E2),
+    nth1(7, PL, E3).
