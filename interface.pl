@@ -20,7 +20,7 @@ init_board([0, 0, 0, 0, -1, 0, 0, 0, 0]).
 
 % Lance la partie en fonction du mode de jeu choisi
 start(0) :-
-    writeln('Niveau de difficulté de l'IA :'),
+    writeln("Niveau de difficulté de l'IA :"),
     level(LVL),
     is_first(Player),
     init_board(B),
@@ -28,9 +28,9 @@ start(0) :-
     Player == 2 -> playIA(B, LVL, Player);
     nl.
 start(1) :- 
-    writeln('Niveau de difficulté de l'IA 1 :'),
+    writeln("Niveau de difficulté de l'IA 1 :"),
     level(LVL1),
-    writeln('Niveau de difficulté de l'IA 2 :'),
+    writeln("Niveau de difficulté de l'IA 2 :"),
     level(LVL2),
     init_board(B),
     playIAvsIA(B, LVL1, LVL2).
@@ -113,7 +113,7 @@ choice_action(B, [C1, C2, C], Player) :-
     C == 2 -> scan_origine(C1), scan_destination(C2), is_move_allowed(C2, C1, C);
     scan_origine(C1), scan_destination(C2), nth0(C1, B, Player), !.
 choice_action(B, Move, Player) :-
-    writeln('Erreur : l'action doit être 0, 1 ou 2 !'),
+    writeln("Erreur : l'action doit être 0, 1 ou 2 !"),
     choice_action(B, Move, Player).
     
 % Demande au joueur de choisir une action
