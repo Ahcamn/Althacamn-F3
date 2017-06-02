@@ -112,9 +112,9 @@ choice_action(B, [C1, C2, C], Player) :-
     C == 0 -> C1 is -1, scan_destination(C2);
     C == 2 -> scan_origine(C1), scan_destination(C2), is_move_allowed(C2, C1, C);
     scan_origine(C1), scan_destination(C2), nth0(C1, B, Player), !.
-choice_action(B, Move, Player) :-
+choice_action(B, [C1, C2, C], Player) :-
     writeln("Erreur : l'action doit être 0, 1 ou 2 !"),
-    choice_action(B, Move, Player).
+    choice_action(B, [C1, C2, C], Player).
     
 % Demande au joueur de choisir une action
 scan_choice(C) :-
