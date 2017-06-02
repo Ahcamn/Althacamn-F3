@@ -2,7 +2,7 @@
 % - get_empty_tile(C1) dans choice_action
 % - modifier la fonction pour la difficulté du jeu
 
-:- module(mod_interface, [init_board/0, init_ui/0, scan_choice/2, start/1]).
+:- module(mod_interface, [init_board/1, init_ui/0, scan_choice/1, start/1]).
 :- use_module('regles_jeu.pl').
 :- use_module('ia.pl').
 
@@ -78,7 +78,7 @@ playIA(B, LVL, Player) :-
     save(Player, Move),
     board(NewB),
     print_board(Player, LVL, NewB),
-    not(won)
+    not(won),
     get_opponent(Player, Opponent),
     play(B1, LVL, Opponent).
    
