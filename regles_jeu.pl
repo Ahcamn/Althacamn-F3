@@ -66,7 +66,7 @@ empty2(8, 6, 7).
 %Modification de l'élément voulu du plateau
 modifyBoard(Val, 0, [_|R], [Val|R]) :- !.
 modifyBoard(Val, I, [X|R1], [X|R2]) :-
-    I > 0, I is I-1, modifyBoard(Val, I, R1, R2), !.
+    I > 0, I1 is I-1, modifyBoard(Val, I1, R1, R2), !.
 
 
 %nombre de pions placés pas le joueur Plr
