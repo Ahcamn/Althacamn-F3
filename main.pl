@@ -2,6 +2,7 @@
 
 % Menu de sélection
 main :-
+  init_ui,
   writeln('----------- Menu ------------'),
   writeln('0 - Joueur Vs. IA'),
   writeln('1 - IA Vs. IA'),
