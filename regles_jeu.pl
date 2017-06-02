@@ -3,7 +3,7 @@
 % - column
 % - diagonal
 
-:- module(mod_regles_jeu, [win/2, numP/3, move/3, setP/3, get_opponent/2]).
+:- module(mod_regles_jeu, [win/2, numP/3, move/4, setP/3, get_opponent/2]).
 
 %Conditions de victoires
 %3 pions sur une ligne
@@ -98,7 +98,9 @@ move(Plr, B, [TS, TE, 1], NewB) :-
   
 %pour déplacement de pion  
 moveP(Plr, B, [TS, TE]) :-
-  !, ,nth0(TS, B, Plr), nth0(TE, B, 0).
+  !,
+  nth0(TS, B, Plr), 
+  nth0(TE, B, 0).
 
 % Déplacer une case
 move(_, B, [TS, TE, 2], NewB) :-
