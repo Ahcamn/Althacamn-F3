@@ -130,7 +130,7 @@ moveT(B, [TS, TE]) :-
     
 
 
-get_opponent(1, 2) :- !.
+get_opponent(1, 2).
 get_opponent(2, 1).
 
 % ----------------- à refaire ------------------
