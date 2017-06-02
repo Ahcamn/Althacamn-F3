@@ -12,7 +12,7 @@ main :-
   writeln('2 - Quitter'),
   scan_choice(C),
   tty_clear,
-  start(C),
+  start(C).
   
   % Lance le menu
 :- set_prolog_stack(global, limit(2*10**9)), main.
