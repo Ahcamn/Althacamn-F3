@@ -127,7 +127,7 @@ scan_choice(C) :-
     
 % Demande au joueur de choisir l'emplacement d'origine
 scan_origine(C) :-
-    nl, writeln('Emplactement d\'origine :'),
+    nl, writeln('Emplacement d\'origine :'),
     read(C),
     integer(C),
     between(0, 8, C), !.
