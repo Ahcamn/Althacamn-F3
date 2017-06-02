@@ -3,7 +3,7 @@
 % - column
 % - diagonal
 
-:- module(mod_regles_jeu, [win/2, numP/3, move/4, setP/3, get_opponent/2]).
+:- module(mod_regles_jeu, [win/2, numP/3, move/4, setP/3, get_opponent/2, row/3, column/3, diagonal/3]).
 
 %Conditions de victoires
 %3 pions sur une ligne
