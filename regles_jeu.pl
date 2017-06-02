@@ -78,6 +78,32 @@ move(Plr, B, [-1, T, 0], NewB) :-
     %garde-fou ici ou dans setP (ou pas du tout)?
     setP(Plr, B, T),
     modifyBoard(Plr, T, B, NewB).
+    
+
+% Déplacer un pion (TE = case d'arrivé, TS = case de départ)
+move(Plr, B, [TS, TE, 1], NewB) :-
+    %garde-fou ici ou dans moveP (ou pas du tout)?
+    moveP(Plr, B, [TS, TE]),
+    modifyBoard(0, TS, B, Temp),
+    modifyBoard(Plr, TE, Temp, NewB).
+
+
+% Déplacer une case
+move(_, B, [TS, TE, 2], NewB) :-
+    %garde-fou ici ou dans moveT (ou pas du tout)?
+    moveT(B, [TS, TE]),
+    modifyBoard(-1, TE, B, Temp),
+    nth0(TE, B, Val),
+    modifyBoard(Val, TS, Temp, NewB).
+
+
+% Déplacer deux cases
+move(_, B, [TS, TE, 3], NewB) :-
+    %garde-fou?
+    empty2(TS, TE, TI),
+    move(_, B, [TS, TI, 2], Temp1),
+    move(_, Temp1, [TI, TE, 2], NewB).
+    
 
 %pour pose de pion
 setP(Plr, [0|R], 0) :- numP(Plr, [0|R], N), N<3.
@@ -90,38 +116,19 @@ setP(Plr, [T0, T1, T2, T3, T4, T5, 0|R], 0) :- numP(Plr, [T0, T1, T2, T3, T4, T5
 setP(Plr, [T0, T1, T2, T3, T4, T5, T6, 0|R], 0) :- numP(Plr, [T0, T1, T2, T3, T4, T5, T6, 0|R], N), N<3.
 setP(Plr, [T0, T1, T2, T3, T4, T5, T6, T7, 0|R], 0) :- numP(Plr, [T0, T1, T2, T3, T4, T5, T6, T7, 0|R], N), N<3.
 
-
-% Déplacer un pion (TE = case d'arrivé, TS = case de départ)
-move(Plr, B, [TS, TE, 1], NewB) :-
-    %garde-fou ici ou dans moveP (ou pas du tout)?
-    moveP(Plr, B, [TS, TE]),
-    modifyBoard(0, TS, B, Temp),
-    modifyBoard(Plr, TE, Temp, NewB).
   
 %pour déplacement de pion  
 moveP(Plr, B, [TS, TE]) :-
     !,
     nth0(TS, B, Plr), 
     nth0(TE, B, 0).
-
-% Déplacer une case
-move(_, B, [TS, TE, 2], NewB) :-
-    %garde-fou ici ou dans moveT (ou pas du tout)?
-    moveT(B, [TS, TE]),
-    modifyBoard(-1, TE, B, Temp),
-    nth0(TE, B, Val),
-    modifyBoard(Val, TS, Temp, NewB).
+    
 
 %pour déplacement de case
 moveT(B, [TS, TE]) :-
     !, empty(TS, TE), nth0(TS, B, -1).
+    
 
-% Déplacer deux cases
-move(_, B, [TS, TE, 3], NewB) :-
-    %garde-fou?
-    empty2(TS, TE, TI),
-    move(_, B, [TS, TI, 2], Temp1),
-    move(_, Temp1, [TI, TE, 2], NewB).
 
 get_opponent(1, 2) :- !.
 get_opponent(2, 1).
