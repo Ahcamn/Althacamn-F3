@@ -26,6 +26,7 @@ start(0) :-
     init_board(B),
     Player == 1 -> play(B, LVL, Player);
     Player == 2 -> playIA(B, LVL, Player);
+    nl.
 start(1) :- 
     writeln('Niveau de difficulté de l'IA 1 :'),
     level(LVL1),
@@ -37,9 +38,9 @@ start(_) :- !.
 
 % Demande la difficulté de l'IA au joueur
 level(LVL) :-
-    writeln('\t0.\tFacile'),
-    writeln('\t1.\tMoyen'),
-    writeln('\t2.\tDifficile'),
+    writeln('\t0. Facile'),
+    writeln('\t1. Moyen'),
+    writeln('\t2. Difficile'),
     read(LVL),
     integer(LVL),
     between(0, 2, LVL), !.
