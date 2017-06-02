@@ -1,3 +1,7 @@
+% TO DO : 
+% - get_empty_tile(C1) dans choice_action
+% - modifier la fonction pour la difficulté du jeu
+
 :- module(mod_interface, [init_board/0, init_ui/0, scan_choice/2, start/1]).
 :- use_module('regles_jeu.pl').
 :- use_module('ia.pl').
@@ -54,7 +58,7 @@ is_first(Player) :-
     between(1, 2, Player), !.
 is_first(Player) :-
     writeln('Erreur : Le choix doit être 1 ou 2 !'),
-    is_first(
+    is_first(Player).
 
 % Tour du joueur
 play(B, LVL, Player) :-
@@ -106,7 +110,7 @@ choice_action(B, [C1, C2, C], Player) :-
     writeln('\t2. Déplacer la case vide'),
     scan_choice(C),
     C == 0 -> C1 is -1, scan_destination(C2);
-    C == 2 -> scan_origine(C1), scan_destination(C2), is_move_allowed(C2, C1, C); % to do : get_empty_tile(C1)
+    C == 2 -> scan_origine(C1), scan_destination(C2), is_move_allowed(C2, C1, C);
     scan_origine(C1), scan_destination(C2), nth0(C1, B, Player), !.
 choice_action(B, Move, Player) :-
     writeln('Erreur : l'action doit être 0, 1 ou 2 !'),
