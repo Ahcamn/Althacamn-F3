@@ -20,7 +20,7 @@ init_board([0, 0, 0, 0, -1, 0, 0, 0, 0]).
 
 % Lance la partie en fonction du mode de jeu choisi
 start(0) :-
-    writeln("Niveau de difficulté de l'IA :"),
+    writeln('Niveau de difficulté de l\'IA :'),
     level(LVL),
     is_first(Player),
     init_board(B),
@@ -28,9 +28,9 @@ start(0) :-
     Player == 2 -> playIA(B, LVL, Player);
     nl.
 start(1) :- 
-    writeln("Niveau de difficulté de l'IA 1 :"),
+    writeln('Niveau de difficulté de l\'IA 1 :'),
     level(LVL1),
-    writeln("Niveau de difficulté de l'IA 2 :"),
+    writeln('Niveau de difficulté de l\'IA 2 :'),
     level(LVL2),
     init_board(B),
     playIAvsIA(LVL1, LVL2).
@@ -127,7 +127,7 @@ scan_choice(C) :-
     
 % Demande au joueur de choisir l'emplacement d'origine
 scan_origine(C) :-
-    nl, writeln("Emplactement d'origine :"),
+    nl, writeln('Emplactement d\'origine :'),
     read(C),
     integer(C),
     between(0, 8, C), !.
