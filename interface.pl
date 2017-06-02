@@ -218,7 +218,7 @@ print_board(Player, -1, [C1, C2, C3, C4, C5, C6, C7, C8, C9]):-
 token(0) :-
     write(' ').
 token(-1) :-
-    write('').
+    write('#').
 token(1) :-
     write('o').
 token(2):-
