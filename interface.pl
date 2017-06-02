@@ -87,7 +87,7 @@ playIA(B, LVL, Player) :-
 playIAvsIA(LVL1, LVL2) :-
     Depth1 is LVL1 + 3,
     Depth2 is LVL2 + 3,
-    playIAvsIA(LVL1, LVL2, Depth1, Depth2, [-1], [-1]), % à revoir
+    playIAvsIA(LVL1, LVL2, Depth1, Depth2, [-1], [-1]). % à revoir
 playIAvsIA(LVL1, LVL2, Depth1, Depth2, P1, P2) :-
     board(B),
     alpha_beta(1, Depth1, B, -10000, 10000, Move, P1, Value), !,
