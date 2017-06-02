@@ -7,7 +7,7 @@ main :-
   writeln('0 - Joueur Vs. IA'),
   writeln('1 - IA Vs. IA'),
   writeln('2 - Quitter'),
-  choix(C),
+  scan_choice(C),
   tty_clear,
   start(C),
   
