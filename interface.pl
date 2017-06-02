@@ -190,10 +190,14 @@ is_move_allowed(7, 1, 3).
 is_move_allowed(8, C, 3) :-
     member(C, [2, 6]).
 
+getDifficulty(0, 'Facile').
+getDifficulty(1, 'Moyen').
+getDifficulty(2, 'Difficile').
+
 % Affiche le plateau de jeu
 print_board(Player, LVL, [C1, C2, C3, C4, C5, C6, C7, C8, C9]):-
     LVL \= -1, !,
-    getLevel(LVL, Level),
+    getDifficulty(LVL, Level),
     write('     _____'), nl,
     write('    |'), token(C1), write(' '), token(C2), write(' '), token(C3), write('|'), nl,
     write('    |'), token(C4), write(' '), token(C5), write(' '), token(C6), write('|'),
