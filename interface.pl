@@ -26,7 +26,6 @@ start(0) :-
     init_board(B),
     Player == 1 -> play(B, LVL, Player);
     Player == 2 -> playIA(B, LVL, Player);
-    .
 start(1) :- 
     writeln('Niveau de difficulté de l'IA 1 :'),
     level(LVL1),
