@@ -34,6 +34,9 @@ start(1) :-
     level(LVL2),
     init_board(_),
     playIAvsIA(LVL1, LVL2).
+start(2) :-
+    init_board(B),
+    playPvP(B, LVL, 1).
 start(_) :- !.
 
 % Demande la difficulté de l'IA au joueur
@@ -60,6 +63,22 @@ is_first(Player) :-
     writeln('Erreur : Le choix doit être 1 ou 2 !'),
     is_first(Player).
 
+% Mode Joueur contre Joueur
+playPvP(B1, LVL, Player) :-
+    board(B),
+    nl, writef("Choisissez une action (Joueur %w) :",[Player]), nl,
+    writeln('\t0. Poser un pion'),
+    writeln('\t1. Déplacer un pion'),
+    writeln('\t2. Déplacer la case vide'),
+    scan_choice(C),
+    action(B, [TS, TE, C], Player),
+    save_move(Player, [TS, TE, C]),
+    board(NewB),
+    print_board(Player, -1, NewB),
+    not(won),
+    get_opponent(Player, Opponent),
+    playPvP(B, LVL, Opponent).
+    
 % Tour du joueur
 play(B1, LVL, Player) :-
     board(B),
@@ -70,12 +89,10 @@ play(B1, LVL, Player) :-
     scan_choice(C),
     action(B, [TS, TE, C], Player),
     save_move(Player, [TS, TE, C]),
-    writeln('test 1'),
     board(NewB),
     print_board(Player, -1, NewB),
     not(won),
     get_opponent(Player, Opponent),
-    writeln('test 2'),
     playIA(B, LVL, Opponent).
     
 action(B, [TS, TE, 0], Player) :-
@@ -95,7 +112,7 @@ action(B, [TS, TE, 2], _) :-
     is_move_allowed(TE, TS, 2), !.
     
 action(B, [TS, TE, I], Player) :-
-    writeln('Erreur : Action impossible !'),
+    nl, writeln('Erreur : Action impossible !'),
     action(B, [TS, TE, I], Player).
     
 save_move(Player, Move) :-
@@ -107,16 +124,12 @@ save_move(Player, Move) :-
 playIA(B, LVL, Player) :-
     board(B1),
     Depth is LVL + 3,
-    writeln('test 3'),
     alpha_beta(Player, Depth, B1, -10000, 10000, Move, B, Value), !,
-    writeln('test 4'),
     save_move(Player, Move),
-    writeln('test 5'),
     board(NewB),
     print_board(Player, LVL, NewB),
     not(won),
     get_opponent(Player, Opponent),
-    writeln('test 6'),
     play(B1, LVL, Opponent).
    
 % Tour de l'IA en mode IA vs IA   
@@ -154,7 +167,7 @@ get_empty_tile(8, B) :- nth0(8, B, -1).
 scan_choice(C) :-
     read(C),
     integer(C),
-    between(0, 2, C), !.  
+    between(0, 3, C), !.  
 scan_choice(C) :-
     writeln('Erreur : Le choix doit être 0, 1 ou 2 !'),
     scan_choice(C).
