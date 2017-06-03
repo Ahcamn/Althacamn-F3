@@ -6,7 +6,7 @@
 :- use_module('regles_jeu.pl').
 :- use_module('ia.pl').
 
-% Permet de sauvegarder le board
+% Permet de sauvegarder le plateau
 :- dynamic board/1.
 
 % Initialise l'interface utilisateur
@@ -97,7 +97,8 @@ playP(OldB, LVL, Player) :-
     not(won),
     get_opponent(Player, Opponent),
     playIA(B, LVL, Opponent).
-    
+ 
+% Vérifie si l'action choisie peut être effecutée 
 action(B, [TS, TE, 0], Player) :-
     TS is -1, 
     scan_destination(TE),
@@ -111,13 +112,13 @@ action(B, [TS, TE, 1], Player) :-
 action(B, [TS, TE, 2], _) :-
     get_empty_tile(TS, B), 
     scan_destination(TE), 
-    moveT(B, [TS, TE]),
-    is_move_allowed(TE, TS, 2), !.
+    moveT(B, [TS, TE]), !.
     
 action(B, [TS, TE, I], Player) :-
     nl, writeln('Erreur : Action impossible !'),
     action(B, [TS, TE, I], Player).
     
+% Sauvegarde le coup du joueur    
 save_move(Player, Move) :-
     retract(board(B)),
     move(Player, B, Move, B1),
@@ -125,19 +126,14 @@ save_move(Player, Move) :-
 
 % Tour de l'IA
 playIA(OldB, LVL, Player) :-
-    writeln('test 0'),
     board(B),
-    writeln('test 1'),
     Depth is LVL + 3,
     alpha_beta(Player, Depth, B, -10000, 10000, Move, OldB, Value), !,
-    writeln('test 2'),
     save_move(Player, Move),
-    writeln('test 3'),
     board(NewB),
     print_board(Player, LVL, NewB),
     not(won),
     get_opponent(Player, Opponent),
-    writeln('test 4'),
     playP(B, LVL, Opponent).
    
 % Tour de l'IA en mode IA vs IA   
@@ -159,7 +155,7 @@ playIAvsIA(LVL1, LVL2, Depth1, Depth2, P1, P2) :-
     not(won),
     playIAvsIA(LVL1, LVL2, Depth1, Depth2, B, NewB).
 
-% trouve la case vide sur le plateau 
+% Trouve la case vide sur le plateau 
 get_empty_tile(0, B) :- nth0(0, B, -1).
 get_empty_tile(1, B) :- nth0(1, B, -1).
 get_empty_tile(2, B) :- nth0(2, B, -1).
@@ -206,40 +202,8 @@ won :-
     win(Player, B),
     writef("Le joueur %w a gagné !", [Player]),
     init_ui, !.
-    
-% Permet de savoir si le déplacement de case choisi est possible
-is_move_allowed(0, T, 2) :-
-    member(T, [1, 3]).
-is_move_allowed(1, T, 2) :-
-    member(T, [0, 2, 4]).
-is_move_allowed(2, T, 2) :-
-    member(T, [1, 5]).
-is_move_allowed(3, T, 2) :-
-    member(T, [0, 4, 6]).
-is_move_allowed(4, T, 2) :-
-    member(T, [1, 5, 7, 3]).
-is_move_allowed(5, T, 2) :-
-    member(T, [2, 8, 4]).
-is_move_allowed(6, T, 2) :-
-    member(T, [3, 7]).
-is_move_allowed(7, T, 2) :-
-    member(T, [4, 8, 6]).
-is_move_allowed(8, T, 2) :-
-    member(T, [5, 7]).
-
-is_move_allowed(0, T, 3) :-
-    member(T, [6, 2]).
-is_move_allowed(1, 7, 3).
-is_move_allowed(2, T, 3) :-
-    member(T, [0, 8]).
-is_move_allowed(3, 5, 3).
-is_move_allowed(5, 3, 3).
-is_move_allowed(6, T, 3) :-
-    member(T, [0, 8]).
-is_move_allowed(7, 1, 3).
-is_move_allowed(8, T, 3) :-
-    member(T, [2, 6]).
-
+   
+% Donne le nom de la difficuté en fonction de son ID
 getDifficulty(0, 'Facile').
 getDifficulty(1, 'Moyen').
 getDifficulty(2, 'Difficile').
