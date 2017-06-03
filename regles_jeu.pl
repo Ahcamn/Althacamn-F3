@@ -129,6 +129,33 @@ moveT(B, [TS, TE]) :-
     nth0(TS, B, -1).
     
 
+% Trouve les cases voisines.
+get_neighbour(0,1).
+get_neighbour(0,3).
+get_neighbour(1,0).
+get_neighbour(1,2).
+get_neighbour(1,4).
+get_neighbour(2,1).
+get_neighbour(2,5).
+get_neighbour(3,0).
+get_neighbour(3,4).
+get_neighbour(3,6).
+get_neighbour(4,1).
+get_neighbour(4,3).
+get_neighbour(4,5).
+get_neighbour(4,7).
+get_neighbour(5,2).
+get_neighbour(5,4).
+get_neighbour(5,8).
+get_neighbour(6,3).
+get_neighbour(6,7).
+get_neighbour(7,4).
+get_neighbour(7,6).
+get_neighbour(7,8).
+get_neighbour(8,5).
+get_neighbour(8,7).
+
+
 % Retourne l'ID de l'adversaire
 get_opponent(1, 2).
 get_opponent(2, 1).
