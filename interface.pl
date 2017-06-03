@@ -1,5 +1,4 @@
 % TO DO : 
-% - get_empty_tile(C1) dans choice_action
 % - modifier la fonction pour la difficulté du jeu
 % - vérifier si le joueur a 3 pions avant de demander l'emplacement 
 
