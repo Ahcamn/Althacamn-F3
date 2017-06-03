@@ -23,16 +23,13 @@ start(0) :-
     writeln('Niveau de difficulté de l\'IA :'),
     level(LVL),
     is_first(Player),
-    init_board(B),
-    Player == 1 -> play(B, LVL, Player);
-    Player == 2 -> playIA(B, LVL, Player);
-    nl.
+    board(B),
+    play(B, LVL, Player).
 start(1) :- 
     writeln('Niveau de difficulté de l\'IA 1 :'),
     level(LVL1),
     writeln('Niveau de difficulté de l\'IA 2 :'),
     level(LVL2),
-    init_board(_),
     playIAvsIA(LVL1, LVL2).
 start(2) :-
     init_board(B),
@@ -62,6 +59,13 @@ is_first(Player) :-
 is_first(Player) :-
     writeln('Erreur : Le choix doit être 1 ou 2 !'),
     is_first(Player).
+    
+play(B, LVL, 1) :-
+    play(B, LVL, Player).
+play(B, LVL, 2) :-
+    playIA(B, LVL, Player).
+play(_, _, _) :- !.
+    
 
 % Mode Joueur contre Joueur
 playPvP(B1, LVL, Player) :-
@@ -80,7 +84,7 @@ playPvP(B1, LVL, Player) :-
     playPvP(B, LVL, Opponent).
     
 % Tour du joueur
-play(B1, LVL, Player) :-
+playP(OldB, LVL, Player) :-
     board(B),
     nl, writeln('Choisissez une action :'),
     writeln('\t0. Poser un pion'),
@@ -121,16 +125,21 @@ save_move(Player, Move) :-
     assert(board(B1)).
 
 % Tour de l'IA
-playIA(B, LVL, Player) :-
-    board(B1),
+playIA(OldB, LVL, Player) :-
+    writeln('test 0'),
+    board(B),
+    writeln('test 1'),
     Depth is LVL + 3,
-    alpha_beta(Player, Depth, B1, -10000, 10000, Move, B, Value), !,
+    alpha_beta(Player, Depth, B, -10000, 10000, Move, OldB, Value), !,
+    writeln('test 2'),
     save_move(Player, Move),
+    writeln('test 3'),
     board(NewB),
     print_board(Player, LVL, NewB),
     not(won),
     get_opponent(Player, Opponent),
-    play(B1, LVL, Opponent).
+    writeln('test 4'),
+    playP(B, LVL, Opponent).
    
 % Tour de l'IA en mode IA vs IA   
 playIAvsIA(LVL1, LVL2) :-
