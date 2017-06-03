@@ -2,7 +2,7 @@
 % - modifier la fonction pour la difficulté du jeu
 % - vérifier si le joueur a 3 pions avant de demander l'emplacement 
 
-:- module(mod_interface, [init_board/1, init_ui/0, scan_choice/1, start/1]).
+:- module(mod_interface, [init_board/1, init_ui/0, scan_choice/1, start/1, move/4]).
 :- use_module('regles_jeu.pl').
 :- use_module('ia.pl').
 
@@ -32,7 +32,7 @@ start(1) :-
     level(LVL1),
     writeln('Niveau de difficulté de l\'IA 2 :'),
     level(LVL2),
-    init_board(B),
+    init_board(_),
     playIAvsIA(LVL1, LVL2).
 start(_) :- !.
 
@@ -61,31 +61,62 @@ is_first(Player) :-
     is_first(Player).
 
 % Tour du joueur
-play(B, LVL, Player) :-
+play(B1, LVL, Player) :-
     board(B),
     nl, writeln('Choisissez une action :'),
     writeln('\t0. Poser un pion'),
     writeln('\t1. Déplacer un pion'),
     writeln('\t2. Déplacer la case vide'),
     scan_choice(C),
-    action(B, [C1, C2, C], Player),
-    save(Player, [C1, C2, C]),
+    action(B, [TS, TE, C], Player),
+    save_move(Player, [TS, TE, C]),
+    writeln('test 1'),
     board(NewB),
     print_board(Player, -1, NewB),
     not(won),
     get_opponent(Player, Opponent),
+    writeln('test 2'),
     playIA(B, LVL, Opponent).
-  
+    
+action(B, [TS, TE, 0], Player) :-
+    TS is -1, 
+    scan_destination(TE),
+    setP(Player, B, TE), !.
+    
+action(B, [TS, TE, 1], Player) :-
+    scan_origin(TS), 
+    scan_destination(TE),
+    moveP(Player, B, [TS, TE]), !.
+    
+action(B, [TS, TE, 2], _) :-
+    get_empty_tile(TS, B), 
+    scan_destination(TE), 
+    moveT(B, [TS, TE]),
+    is_move_allowed(TE, TS, 2), !.
+    
+action(B, [TS, TE, I], Player) :-
+    writeln('Erreur : Action impossible !'),
+    action(B, [TS, TE, I], Player).
+    
+save_move(Player, Move) :-
+    retract(board(B)),
+    move(Player, B, Move, B1),
+    assert(board(B1)).
+
 % Tour de l'IA
 playIA(B, LVL, Player) :-
     board(B1),
     Depth is LVL + 3,
+    writeln('test 3'),
     alpha_beta(Player, Depth, B1, -10000, 10000, Move, B, Value), !,
-    save(Player, Move),
+    writeln('test 4'),
+    save_move(Player, Move),
+    writeln('test 5'),
     board(NewB),
     print_board(Player, LVL, NewB),
     not(won),
     get_opponent(Player, Opponent),
+    writeln('test 6'),
     play(B1, LVL, Opponent).
    
 % Tour de l'IA en mode IA vs IA   
@@ -96,32 +127,16 @@ playIAvsIA(LVL1, LVL2) :-
 playIAvsIA(LVL1, LVL2, Depth1, Depth2, P1, P2) :-
     board(B),
     alpha_beta(1, Depth1, B, -10000, 10000, Move, P1, Value), !,
-    save(1, Move),
+    save_move(1, Move),
     board(NewB),
     print_board(1, LVL1, NewB),
     not(won),
     alpha_beta(2, Depth2, NewB, -10000, 10000, Move2, P2, Value), !,
-    save(2, Move2),
+    save_move(2, Move2),
     board(NewB2),
     print_board(2, LVL2, NewB2),
     not(won),
     playIAvsIA(LVL1, LVL2, Depth1, Depth2, B, NewB).
-  
-% Lance l'action en fonction du coup choisi
-action(_, [C1, C2, 0], Player) :-
-    C1 is -1, 
-    scan_destination(C2).
-    
-action(B, [C1, C2, 1], Player) :-
-    scan_origin(C1), 
-    scan_destination(C2), 
-    nth0(C1, B, Player).
-    
-action(B, [C1, C2, 2], Player) :-
-    get_empty_tile(C1, B), 
-    scan_destination(C2), 
-    is_move_allowed(C2, C1, 2).
-
 
 % trouve la case vide sur le plateau 
 get_empty_tile(0, B) :- nth0(0, B, -1).
@@ -145,24 +160,24 @@ scan_choice(C) :-
     scan_choice(C).
     
 % Demande au joueur de choisir l'emplacement d'origine
-scan_origin(C) :-
+scan_origin(T) :-
     nl, writeln('Emplacement d\'origine :'),
-    read(C),
-    integer(C),
-    between(0, 8, C), !.
-scan_origin(C) :-
+    read(T),
+    integer(T),
+    between(0, 8, T), !.
+scan_origin(T) :-
     writeln('Erreur : Le choix doit être entre 0 et 8 inclus !'),
-    scan_choice(C).
+    scan_choice(T).
 
 % Demande au joueur de choisir la destination
-scan_destination(C) :-
+scan_destination(T) :-
     nl, writeln('Destination :'),
-    read(C),
-    integer(C),
-    between(0, 8, C), !.
-scan_destination(C) :-
+    read(T),
+    integer(T),
+    between(0, 8, T), !.
+scan_destination(T) :-
     writeln('Erreur : Le choix doit être entre 0 et 8 inclus !'),
-    scan_destination(C).
+    scan_destination(T).
   
 % Vérifie si un joueur à gagné la partie 
 won :-
@@ -170,67 +185,94 @@ won :-
     win(Player, B),
     writef("Le joueur %w a gagné !", [Player]),
     init_ui, !.
-   
-save(Player,Move) :-
-    retract(board(B)),
-    move(Player,B,Move,B1),
-    assert(board(B1)).
     
 % Permet de savoir si le déplacement de case choisi est possible
-is_move_allowed(0, C, 2) :-
-    member(C, [1, 3]).
-is_move_allowed(1, C, 2) :-
-    member(C, [0, 2, 4]).
-is_move_allowed(2, C, 2) :-
-    member(C, [1, 5]).
-is_move_allowed(3, C, 2) :-
-    member(C, [0, 4, 6]).
-is_move_allowed(4, C, 2) :-
-    member(C, [1, 5, 7, 3]).
-is_move_allowed(5, C, 2) :-
-    member(C, [2, 8, 4]).
-is_move_allowed(6, C, 2) :-
-    member(C, [3, 7]).
-is_move_allowed(7, C, 2) :-
-    member(C, [4, 8, 6]).
-is_move_allowed(8, C, 2) :-
-    member(C, [5, 7]).
+is_move_allowed(0, T, 2) :-
+    member(T, [1, 3]).
+is_move_allowed(1, T, 2) :-
+    member(T, [0, 2, 4]).
+is_move_allowed(2, T, 2) :-
+    member(T, [1, 5]).
+is_move_allowed(3, T, 2) :-
+    member(T, [0, 4, 6]).
+is_move_allowed(4, T, 2) :-
+    member(T, [1, 5, 7, 3]).
+is_move_allowed(5, T, 2) :-
+    member(T, [2, 8, 4]).
+is_move_allowed(6, T, 2) :-
+    member(T, [3, 7]).
+is_move_allowed(7, T, 2) :-
+    member(T, [4, 8, 6]).
+is_move_allowed(8, T, 2) :-
+    member(T, [5, 7]).
 
-is_move_allowed(0, C, 3) :-
-    member(C, [6, 2]).
+is_move_allowed(0, T, 3) :-
+    member(T, [6, 2]).
 is_move_allowed(1, 7, 3).
-is_move_allowed(2, C, 3) :-
-    member(C, [0, 8]).
+is_move_allowed(2, T, 3) :-
+    member(T, [0, 8]).
 is_move_allowed(3, 5, 3).
 is_move_allowed(5, 3, 3).
-is_move_allowed(6, C, 3) :-
-    member(C, [0, 8]).
+is_move_allowed(6, T, 3) :-
+    member(T, [0, 8]).
 is_move_allowed(7, 1, 3).
-is_move_allowed(8, C, 3) :-
-    member(C, [2, 6]).
+is_move_allowed(8, T, 3) :-
+    member(T, [2, 6]).
 
 getDifficulty(0, 'Facile').
 getDifficulty(1, 'Moyen').
 getDifficulty(2, 'Difficile').
 
+
+%Modification de l'élément voulu du plateau
+modifyBoard(Val, 0, [_|R], [Val|R]) :- !.
+modifyBoard(Val, I, [X|R1], [X|R2]) :-
+    I > 0, I1 is I-1, modifyBoard(Val, I1, R1, R2), !.
+    
+    
+% Poser un pion (max 3)
+move(Plr, B, [-1, T, 0], NewB) :-
+    modifyBoard(Plr, T, B, NewB).
+    
+
+% Déplacer un pion (TE = case d'arrivé, TS = case de départ)
+move(Plr, B, [TS, TE, 1], NewB) :-
+    modifyBoard(0, TS, B, Temp),
+    modifyBoard(Plr, TE, Temp, NewB).
+
+
+% Déplacer une case
+move(_, B, [TS, TE, 2], NewB) :-
+    modifyBoard(-1, TE, B, Temp),
+    nth0(TE, B, Val),
+    modifyBoard(Val, TS, Temp, NewB).
+
+
+% Déplacer deux cases
+move(_, B, [TS, TE, 3], NewB) :-
+    empty2(TS, TE, TI),
+    move(_, B, [TS, TI, 2], Temp1),
+    move(_, Temp1, [TI, TE, 2], NewB).
+    
+
 % Affiche le plateau de jeu
-print_board(Player, LVL, [C1, C2, C3, C4, C5, C6, C7, C8, C9]):-
+print_board(Player, LVL, [T1, T2, T3, T4, T5, T6, T7, T8, T9]):-
     LVL \= -1, !,
     getDifficulty(LVL, Level),
     write('     _____'), nl,
-    write('    |'), token(C1), write(' '), token(C2), write(' '), token(C3), write('|'), nl,
-    write('    |'), token(C4), write(' '), token(C5), write(' '), token(C6), write('|'),
+    write('    |'), token(T1), write(' '), token(T2), write(' '), token(T3), write('|'), nl,
+    write('    |'), token(T4), write(' '), token(T5), write(' '), token(T6), write('|'),
     write('\tPlayer '), write(Player), write(' (IA) '), write(Level), nl,
-    write('    |'), token(C7), write(' '), token(C8), write(' '), token(C9), write('|'), nl,
+    write('    |'), token(T7), write(' '), token(T8), write(' '), token(T9), write('|'), nl,
     write('     -----'), nl, nl.
 
-print_board(Player, -1, [C1, C2, C3, C4, C5, C6, C7, C8, C9]):-
+print_board(Player, -1, [T1, T2, T3, T4, T5, T6, T7, T8, T9]):-
     !,
     write('     _____'), nl,
-    write('    |'), token(C1), write(' '), token(C2), write(' '), token(C3), write('|'), nl,
-    write('    |'), token(C4), write(' '), token(C5), write(' '), token(C6), write('|'), 
+    write('    |'), token(T1), write(' '), token(T2), write(' '), token(T3), write('|'), nl,
+    write('    |'), token(T4), write(' '), token(T5), write(' '), token(T6), write('|'), 
     write('\tPlayer '), write(Player), write(' (Joueur) '), nl,
-    write('    |'), token(C7), write(' '), token(C8), write(' '), token(C9), write('|'), nl,
+    write('    |'), token(T7), write(' '), token(T8), write(' '), token(T9), write('|'), nl,
     write('     -----'), nl, nl.
     
 % Affecte un caractère à chaque cases du plateau de jeu en fonction de leur id
