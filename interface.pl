@@ -61,7 +61,7 @@ is_first(Player) :-
     is_first(Player).
     
 play(B, LVL, 1) :-
-    play(B, LVL, Player).
+    playP(B, LVL, Player).
 play(B, LVL, 2) :-
     playIA(B, LVL, Player).
 play(_, _, _) :- !.
