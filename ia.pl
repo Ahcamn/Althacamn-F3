@@ -5,6 +5,7 @@
 
 :- module(mod_ia, [eval_bord/2, alpha_beta/8]).
 :- use_module('regles_jeu.pl').
+:- use_module('interface.pl').
 :- use_module(library(lists)).
 
 
