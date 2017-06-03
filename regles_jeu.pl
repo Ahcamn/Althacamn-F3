@@ -5,25 +5,25 @@
 % - finir move
 %
 
-:- module(mod_regles_jeu, [win/2, empty2/3, numP/3, moveP/3, moveT/2, setP/3, get_opponent/2, row/3, column/3, diagonal/3]).
+:- module(mod_regles_jeu, [win/2, empty2/3, is_move_allowed/3, numP/3, moveP/3, moveT/2, setP/3, get_opponent/2, row/3, column/3, diagonal/3]).
 
-%Conditions de victoires
-%3 pions sur une ligne
+% Conditions de victoires
+% 3 pions sur une ligne
 win(Plr, [Plr,Plr,Plr,_,_,_,_,_,_]) :- Plr \= 0, !.
 win(Plr, [_,_,_,Plr,Plr,Plr,_,_,_]) :- Plr \= 0, !.
 win(Plr, [_,_,_,_,_,_,Plr,Plr,Plr]) :- Plr \= 0, !.
 
-%3 pions sur une colonne
+% 3 pions sur une colonne
 win(Plr, [Plr,_,_,Plr,_,_,Plr,_,_]) :- Plr \= 0, !.
 win(Plr, [_,Plr,_,_,Plr,_,_,Plr,_]) :- Plr \= 0, !.
 win(Plr, [_,_,Plr,_,_,Plr,_,_,Plr]) :- Plr \= 0, !.
 
-%3 pions sur une diagonale
+% 3 pions sur une diagonale
 win(Plr, [Plr,_,_,_,Plr,_,_,_,Plr]) :- Plr \= 0, !.
 win(Plr, [_,_,Plr,_,Plr,_,Plr,_,_]) :- Plr \= 0, !.
 
 
-%position de la case déplaçable en fonction de la case vide
+% Position de la case déplaçable en fonction de la case vide
 empty(0, 1).
 empty(0, 3).
 empty(1, 0).
@@ -49,7 +49,7 @@ empty(7, 8).
 empty(8, 5).
 empty(8, 7).
 
-%retourne l'élément central de deux cases opposées pour le déplacement de 2 cases
+% Retourne l'élément central de deux cases opposées pour le déplacement de 2 cases
 empty2(0, 6, 3).
 empty2(6, 0, 3).
 empty2(1, 7, 4).
@@ -63,12 +63,46 @@ empty2(2, 0, 1).
 empty2(6, 8, 7).
 empty2(8, 6, 7).
 
+% Permet de savoir si le déplacement de case choisi est possible
+is_move_allowed(0, T, 2) :-
+    member(T, [1, 3]).
+is_move_allowed(1, T, 2) :-
+    member(T, [0, 2, 4]).
+is_move_allowed(2, T, 2) :-
+    member(T, [1, 5]).
+is_move_allowed(3, T, 2) :-
+    member(T, [0, 4, 6]).
+is_move_allowed(4, T, 2) :-
+    member(T, [1, 5, 7, 3]).
+is_move_allowed(5, T, 2) :-
+    member(T, [2, 8, 4]).
+is_move_allowed(6, T, 2) :-
+    member(T, [3, 7]).
+is_move_allowed(7, T, 2) :-
+    member(T, [4, 8, 6]).
+is_move_allowed(8, T, 2) :-
+    member(T, [5, 7]).
 
-%nombre de pions placés pas le joueur Plr
-numP(Plr, B, N) :- sublist(=(Plr), B, L), length(L, N).
+is_move_allowed(0, T, 3) :-
+    member(T, [6, 2]).
+is_move_allowed(1, 7, 3).
+is_move_allowed(2, T, 3) :-
+    member(T, [0, 8]).
+is_move_allowed(3, 5, 3).
+is_move_allowed(5, 3, 3).
+is_move_allowed(6, T, 3) :-
+    member(T, [0, 8]).
+is_move_allowed(7, 1, 3).
+is_move_allowed(8, T, 3) :-
+    member(T, [2, 6]).
+
+% Nombre de pions placés pas le joueur (Plr)
+numP(Plr, B, N) :- 
+    sublist(=(Plr), B, L), 
+    length(L, N).
     
 
-%pour pose de pion
+% Vérifie si le pion peut être posé
 setP(Plr, [0|R], 0) :- numP(Plr, [0|R], N), N<3.
 setP(Plr, [T0, 0|R], 1) :- numP(Plr, [T0, 0|R], N), N<3.
 setP(Plr, [T0, T1, 0|R], 2) :- numP(Plr, [T0, T1, 0|R], N), N<3.
@@ -80,19 +114,22 @@ setP(Plr, [T0, T1, T2, T3, T4, T5, T6, 0|R], 7) :- numP(Plr, [T0, T1, T2, T3, T4
 setP(Plr, [T0, T1, T2, T3, T4, T5, T6, T7, 0|R], 8) :- numP(Plr, [T0, T1, T2, T3, T4, T5, T6, T7, 0|R], N), N<3.
 
   
-%pour déplacement de pion  
+% Vérifie si le pion peut être bougé
 moveP(Plr, B, [TS, TE]) :-
     !, 
     nth0(TS, B, Plr), 
     nth0(TE, B, 0).
     
 
-%pour déplacement de case
+% Vérifie si la case vide peut être déplacée
 moveT(B, [TS, TE]) :-
-    !, empty(TS, TE), nth0(TS, B, -1).
+    !, 
+    empty(TS, TE), 
+    is_move_allowed(TE, TS, 2),
+    nth0(TS, B, -1).
     
 
-
+% Retourne l'ID de l'adversaire
 get_opponent(1, 2).
 get_opponent(2, 1).
 
