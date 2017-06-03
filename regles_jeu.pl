@@ -5,7 +5,7 @@
 % - finir move
 %
 
-:- module(mod_regles_jeu, [win/2, numP/3, move/4, setP/3, get_opponent/2, row/3, column/3, diagonal/3]).
+:- module(mod_regles_jeu, [win/2, empty2/3, numP/3, moveP/3, moveT/2, setP/3, get_opponent/2, row/3, column/3, diagonal/3]).
 
 %Conditions de victoires
 %3 pions sur une ligne
@@ -63,46 +63,9 @@ empty2(2, 0, 1).
 empty2(6, 8, 7).
 empty2(8, 6, 7).
 
-%Modification de l'élément voulu du plateau
-modifyBoard(Val, 0, [_|R], [Val|R]) :- !.
-modifyBoard(Val, I, [X|R1], [X|R2]) :-
-    I > 0, I1 is I-1, modifyBoard(Val, I1, R1, R2), !.
-
 
 %nombre de pions placés pas le joueur Plr
 numP(Plr, B, N) :- sublist(=(Plr), B, L), length(L, N).
-
-
-% Poser un pion (max 3)
-move(Plr, B, [-1, T, 0], NewB) :-
-    %garde-fou ici ou dans setP (ou pas du tout)?
-    setP(Plr, B, T),
-    modifyBoard(Plr, T, B, NewB).
-    
-
-% Déplacer un pion (TE = case d'arrivé, TS = case de départ)
-move(Plr, B, [TS, TE, 1], NewB) :-
-    %garde-fou ici ou dans moveP (ou pas du tout)?
-    moveP(Plr, B, [TS, TE]),
-    modifyBoard(0, TS, B, Temp),
-    modifyBoard(Plr, TE, Temp, NewB).
-
-
-% Déplacer une case
-move(_, B, [TS, TE, 2], NewB) :-
-    %garde-fou ici ou dans moveT (ou pas du tout)?
-    moveT(B, [TS, TE]),
-    modifyBoard(-1, TE, B, Temp),
-    nth0(TE, B, Val),
-    modifyBoard(Val, TS, Temp, NewB).
-
-
-% Déplacer deux cases
-move(_, B, [TS, TE, 3], NewB) :-
-    %garde-fou?
-    empty2(TS, TE, TI),
-    move(_, B, [TS, TI, 2], Temp1),
-    move(_, Temp1, [TI, TE, 2], NewB).
     
 
 %pour pose de pion
@@ -119,7 +82,7 @@ setP(Plr, [T0, T1, T2, T3, T4, T5, T6, T7, 0|R], 8) :- numP(Plr, [T0, T1, T2, T3
   
 %pour déplacement de pion  
 moveP(Plr, B, [TS, TE]) :-
-    !,
+    !, 
     nth0(TS, B, Plr), 
     nth0(TE, B, 0).
     
