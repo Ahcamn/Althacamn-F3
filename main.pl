@@ -5,9 +5,11 @@
 
 % Crédits
 credit :- 
-  writeln('------- Programme écrit par --------'),
-  writeln('--------- Florian Rifflart ---------'),
-  writeln('---------- Pierrick  Graf ----------').
+  writeln('-------------------------------------'),
+  writeln('\tProgramme écrit par'),
+  writeln('\t Florian Rifflart'),
+  writeln('\t  Pierrick Graf'),
+  writeln('-------------------------------------').
   
 
 % Menu de sélection
