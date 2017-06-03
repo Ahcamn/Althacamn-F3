@@ -32,7 +32,7 @@ start(1) :-
     level(LVL2),
     playIAvsIA(LVL1, LVL2).
 start(2) :-
-    init_board(B),
+    board(B),
     playPvP(B, LVL, 1).
 start(_) :- !.
 
@@ -61,14 +61,13 @@ is_first(Player) :-
     is_first(Player).
     
 play(B, LVL, 1) :-
-    playP(B, LVL, Player).
+    playP(B, LVL, 1).
 play(B, LVL, 2) :-
-    playIA(B, LVL, Player).
-play(_, _, _) :- !.
+    playIA(B, LVL, 2).
     
 
 % Mode Joueur contre Joueur
-playPvP(B1, LVL, Player) :-
+playPvP(OldB, LVL, Player) :-
     board(B),
     nl, writef("Choisissez une action (Joueur %w) :",[Player]), nl,
     writeln('\t0. Poser un pion'),
