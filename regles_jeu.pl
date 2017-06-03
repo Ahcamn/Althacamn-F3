@@ -117,6 +117,7 @@ setP(Plr, [T0, T1, T2, T3, T4, T5, T6, T7, 0|R], 8) :- numP(Plr, [T0, T1, T2, T3
 % Vérifie si le pion peut être bougé
 moveP(Plr, B, [TS, TE]) :-
     !, 
+    is_move_allowed(TE, TS, 2),
     nth0(TS, B, Plr), 
     nth0(TE, B, 0).
     
