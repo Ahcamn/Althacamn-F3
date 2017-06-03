@@ -3,9 +3,16 @@
 
 :- use_module('interface.pl').
 
+% Crédits
+credit :- 
+  writeln('------- Programme écrit par --------'),
+  writeln('--------- Florian Rifflart ---------'),
+  writeln('---------- Pierrick  Graf ----------').
+  
+
 % Menu de sélection
 main :-
-  init_ui,
+  init_ui;
   writeln('----------- Menu ------------'),
   writeln('\t0 - Joueur Vs. IA'),
   writeln('\t1 - IA Vs. IA'),
