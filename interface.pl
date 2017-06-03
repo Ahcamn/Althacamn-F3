@@ -63,8 +63,13 @@ is_first(Player) :-
 % Tour du joueur
 play(B, LVL, Player) :-
     board(B),
-    choice_action(B, Move, Player),
-    save(Player, Move),
+    nl, writeln('Choisissez une action :'),
+    writeln('\t0. Poser un pion'),
+    writeln('\t1. Déplacer un pion'),
+    writeln('\t2. Déplacer la case vide'),
+    scan_choice(C),
+    action(B, [C1, C2, C], Player),
+    save(Player, [C1, C2, C]),
     board(NewB),
     print_board(Player, -1, NewB),
     not(won),
@@ -102,19 +107,20 @@ playIAvsIA(LVL1, LVL2, Depth1, Depth2, P1, P2) :-
     not(won),
     playIAvsIA(LVL1, LVL2, Depth1, Depth2, B, NewB).
   
-% Permet de définir un coup
-choice_action(B, [C1, C2, C], Player) :-
-    nl, writeln('Choisissez une action :'),
-    writeln('\t0. Poser un pion'),
-    writeln('\t1. Déplacer un pion'),
-    writeln('\t2. Déplacer la case vide'),
-    scan_choice(C),
-    C == 0 -> C1 is -1, scan_destination(C2);
-    C == 2 -> get_empty_tile(C1, B), scan_destination(C2), is_move_allowed(C2, C1, C);
-    scan_origin(C1), scan_destination(C2), nth0(C1, B, Player), !.
-choice_action(B, [C1, C2, C], Player) :-
-    writeln('Erreur : action impossible !'),
-    choice_action(B, [C1, C2, C], Player).
+% Lance l'action en fonction du coup choisi
+action(_, [C1, C2, 0], Player) :-
+    C1 is -1, 
+    scan_destination(C2).
+    
+action(B, [C1, C2, 1], Player) :-
+    scan_origin(C1), 
+    scan_destination(C2), 
+    nth0(C1, B, Player).
+    
+action(B, [C1, C2, 2], Player) :-
+    get_empty_tile(C1, B), 
+    scan_destination(C2), 
+    is_move_allowed(C2, C1, 2).
 
 
 % trouve la case vide sur le plateau 
