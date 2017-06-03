@@ -1,6 +1,5 @@
 % TO DO : 
 % - modifier la fonction pour la difficulté du jeu
-% - vérifier si le joueur a 3 pions avant de demander l'emplacement 
 
 :- module(mod_interface, [init_board/1, init_ui/0, scan_choice/1, start/1, move/4]).
 :- use_module('regles_jeu.pl').
