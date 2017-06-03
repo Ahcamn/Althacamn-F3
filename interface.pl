@@ -1,3 +1,6 @@
+% TO DO :
+% - Bouger 2 cases
+
 :- module(mod_interface, [init_board/1, init_ui/0, scan_choice/1, start/1, move/4]).
 :- use_module('regles_jeu.pl').
 :- use_module('ia.pl').
@@ -65,6 +68,7 @@ play(B, LVL, 2) :-
 % Mode Joueur contre Joueur
 playPvP(OldB, LVL, Player) :-
     board(B),
+    print_locations,
     nl, writef("Choisissez une action (Joueur %w) :",[Player]), nl,
     writeln('\t0. Poser un pion'),
     writeln('\t1. Déplacer un pion'),
@@ -81,6 +85,7 @@ playPvP(OldB, LVL, Player) :-
 % Tour du joueur
 playP(OldB, LVL, Player) :-
     board(B),
+    print_locations,
     nl, writeln('Choisissez une action :'),
     writeln('\t0. Poser un pion'),
     writeln('\t1. Déplacer un pion'),
@@ -240,27 +245,34 @@ move(_, B, [TS, TE, 3], NewB) :-
 print_board(Player, LVL, [T1, T2, T3, T4, T5, T6, T7, T8, T9]):-
     LVL \= -1, !,
     getDifficulty(LVL, Level),
-    write('     _____'), nl,
+    writeln('     _____'),
     write('    |'), token(T1), write(' '), token(T2), write(' '), token(T3), write('|'), nl,
     write('    |'), token(T4), write(' '), token(T5), write(' '), token(T6), write('|'),
     write('\tPlayer '), write(Player), write(' (IA) '), write(Level), nl,
     write('    |'), token(T7), write(' '), token(T8), write(' '), token(T9), write('|'), nl,
-    write('     -----'), nl, nl.
+    writeln('     -----'), nl.
 
 print_board(Player, -1, [T1, T2, T3, T4, T5, T6, T7, T8, T9]):-
     !,
-    write('     _____'), nl,
+    writeln('     _____'),
     write('    |'), token(T1), write(' '), token(T2), write(' '), token(T3), write('|'), nl,
     write('    |'), token(T4), write(' '), token(T5), write(' '), token(T6), write('|'), 
     write('\tPlayer '), write(Player), write(' (Joueur) '), nl,
     write('    |'), token(T7), write(' '), token(T8), write(' '), token(T9), write('|'), nl,
-    write('     -----'), nl, nl.
+    writeln('     -----'), nl.
+    
+print_locations :-
+    writeln('                          _____ '),
+    writeln('                         |0 1 2|'),
+    writeln('     Emplacements   ->   |3 4 5|'),
+    writeln('                         |6 7 8|'),
+    writeln('                          ----- ').
     
 % Affecte un caractère à chaque cases du plateau de jeu en fonction de leur id
+token(-1) :-
+    write('■').
 token(0) :-
     write(' ').
-token(-1) :-
-    write('#').
 token(1) :-
     write('o').
 token(2):-
