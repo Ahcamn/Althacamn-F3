@@ -14,7 +14,7 @@ credit :-
 
 % Menu de sélection
 main :-
-  init_ui;
+  init_ui,
   writeln('----------- Menu ------------'),
   writeln('\t0 - Joueur Vs. IA'),
   writeln('\t1 - IA Vs. IA'),
