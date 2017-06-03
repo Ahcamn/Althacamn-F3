@@ -180,7 +180,7 @@ scan_origin(T) :-
     between(0, 8, T), !.
 scan_origin(T) :-
     writeln('Erreur : Le choix doit être entre 0 et 8 inclus !'),
-    scan_choice(T).
+    scan_origin(T).
 
 % Demande au joueur de choisir la destination
 scan_destination(T) :-
