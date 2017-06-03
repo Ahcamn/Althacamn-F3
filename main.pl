@@ -9,7 +9,8 @@ main :-
   writeln('----------- Menu ------------'),
   writeln('\t0 - Joueur Vs. IA'),
   writeln('\t1 - IA Vs. IA'),
-  writeln('\t2 - Quitter'),
+  writeln('\t2 - Joueur Vs. Joueur'),
+  writeln('\t3 - Quitter'),
   scan_choice(C),
   tty_clear,
   start(C).
