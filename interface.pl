@@ -1,6 +1,3 @@
-% TO DO : 
-% - modifier la fonction pour la difficulté du jeu
-
 :- module(mod_interface, [init_board/1, init_ui/0, scan_choice/1, start/1, move/4]).
 :- use_module('regles_jeu.pl').
 :- use_module('ia.pl').
@@ -37,14 +34,14 @@ start(_) :- !.
 
 % Demande la difficulté de l'IA au joueur
 level(LVL) :-
-    writeln('\t0. Facile'),
-    writeln('\t1. Moyen'),
-    writeln('\t2. Difficile'),
+    writeln('\t1. Facile'),
+    writeln('\t2. Moyen'),
+    writeln('\t3. Difficile'),
     read(LVL),
     integer(LVL),
-    between(0, 2, LVL), !.
+    between(1, 3, LVL), !.
 level(LVL) :-
-    writeln('Erreur : Le choix doit être 0, 1 ou 2 !'),
+    writeln('Erreur : Le choix doit être 1, 2 ou 3 !'),
     level(LVL).
   
 % Demande au joueur si il veut commencer en 1er le jeu
@@ -126,7 +123,7 @@ save_move(Player, Move) :-
 % Tour de l'IA
 playIA(OldB, LVL, Player) :-
     board(B),
-    Depth is LVL + 3,
+    Depth is LVL*2,
     alpha_beta(Player, Depth, B, -10000, 10000, Move, OldB, Value), !,
     save_move(Player, Move),
     board(NewB),
@@ -137,8 +134,8 @@ playIA(OldB, LVL, Player) :-
    
 % Tour de l'IA en mode IA vs IA   
 playIAvsIA(LVL1, LVL2) :-
-    Depth1 is LVL1 + 3,
-    Depth2 is LVL2 + 3,
+    Depth1 is LVL1*2,
+    Depth2 is LVL2*2,
     playIAvsIA(LVL1, LVL2, Depth1, Depth2, [-1], [-1]). % à revoir
 playIAvsIA(LVL1, LVL2, Depth1, Depth2, P1, P2) :-
     board(B),
