@@ -66,7 +66,7 @@ play(B, LVL, Player) :-
     choice_action(B, Move, Player),
     save(Player, Move),
     board(NewB),
-    print_board(Player, LVL, NewB),
+    print_board(Player, -1, NewB),
     not(won),
     get_opponent(Player, Opponent),
     playIA(B, LVL, Opponent).
@@ -222,8 +222,8 @@ print_board(Player, -1, [C1, C2, C3, C4, C5, C6, C7, C8, C9]):-
     !,
     write('     _____'), nl,
     write('    |'), token(C1), write(' '), token(C2), write(' '), token(C3), write('|'), nl,
+    write('    |'), token(C4), write(' '), token(C5), write(' '), token(C6), write('|'), 
     write('\tPlayer '), write(Player), write(' (Joueur) '), nl,
-    write('  |'), token(C4), write(' '), token(C5), write(' '), token(C6), write('|\tJoueur'), nl,
     write('    |'), token(C7), write(' '), token(C8), write(' '), token(C9), write('|'), nl,
     write('     -----'), nl, nl.
     
