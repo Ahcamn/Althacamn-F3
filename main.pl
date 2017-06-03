@@ -1,25 +1,24 @@
-% TO DO :
-% - Crédits
-
 :- use_module('interface.pl').
 
 % Crédits
 credit :- 
   writeln('-------------------------------------'),
   writeln('\tProgramme écrit par'),
-  writeln('\t Florian Rifflart'),
-  writeln('\t  Pierrick Graf'),
-  writeln('-------------------------------------').
+  writeln('\t Florian RIFFLART'),
+  writeln('\t  Pierrick GRAF'),
+  writeln('-------------------------------------'), nl, nl.
   
 
 % Menu de sélection
 main :-
+  credit,
   init_ui,
-  writeln('----------- Menu ------------'),
+  writeln('-------------------------------------'),
   writeln('\t0 - Joueur Vs. IA'),
   writeln('\t1 - IA Vs. IA'),
   writeln('\t2 - Joueur Vs. Joueur'),
   writeln('\t3 - Quitter'),
+  writeln('-------------------------------------'),
   menu_choice(C),
   tty_clear,
   start(C).
