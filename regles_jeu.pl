@@ -2,8 +2,6 @@
 % - row
 % - column
 % - diagonal
-% - finir move
-%
 
 :- module(mod_regles_jeu, [win/2, empty2/3, is_move_allowed/3, numP/3, moveP/3, moveT/2, setP/3, get_opponent/2, row/3, column/3, diagonal/3]).
 
