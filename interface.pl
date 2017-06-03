@@ -111,7 +111,7 @@ choice_action(B, [C1, C2, C], Player) :-
     writeln('\t2. Déplacer la case vide'),
     scan_choice(C),
     C == 0 -> C1 is -1, scan_destination(C2);
-    C == 2 -> search_empty(C1, B), scan_destination(C2), is_move_allowed(C2, C1, C);
+    C == 2 -> get_empty_tile(C1, B), scan_destination(C2), is_move_allowed(C2, C1, C);
     scan_origin(C1), scan_destination(C2), nth0(C1, B, Player), !.
 choice_action(B, [C1, C2, C], Player) :-
     writeln('Erreur : action impossible !'),
@@ -119,15 +119,15 @@ choice_action(B, [C1, C2, C], Player) :-
 
 
 % trouve la case vide sur le plateau 
-search_empty(0, B) :- nth0(0, B, -1).
-search_empty(1, B) :- nth0(1, B, -1).
-search_empty(2, B) :- nth0(2, B, -1).
-search_empty(3, B) :- nth0(3, B, -1).
-search_empty(4, B) :- nth0(4, B, -1).
-search_empty(5, B) :- nth0(5, B, -1).
-search_empty(6, B) :- nth0(6, B, -1).
-search_empty(7, B) :- nth0(7, B, -1).
-search_empty(8, B) :- nth0(8, B, -1).
+get_empty_tile(0, B) :- nth0(0, B, -1).
+get_empty_tile(1, B) :- nth0(1, B, -1).
+get_empty_tile(2, B) :- nth0(2, B, -1).
+get_empty_tile(3, B) :- nth0(3, B, -1).
+get_empty_tile(4, B) :- nth0(4, B, -1).
+get_empty_tile(5, B) :- nth0(5, B, -1).
+get_empty_tile(6, B) :- nth0(6, B, -1).
+get_empty_tile(7, B) :- nth0(7, B, -1).
+get_empty_tile(8, B) :- nth0(8, B, -1).
 
 
 % Demande au joueur de choisir une action
