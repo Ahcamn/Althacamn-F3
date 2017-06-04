@@ -29,7 +29,9 @@ start(1) :-
     level(LVL1),
     writeln('Niveau de difficulté de l\'IA 2 :'),
     level(LVL2),
-    playIAvsIA(LVL1, LVL2).
+    Depth1 is LVL1*2,
+    Depth2 is LVL2*2,
+    playIAvsIA(LVL1, LVL2, Depth1, Depth2, [-1], [-1]).
 start(2) :-
     board(B),
     playPvP(B, LVL, 1).
@@ -138,10 +140,6 @@ playIA(OldB, LVL, Player) :-
     playP(B, LVL, Opponent).
    
 % Tour de l'IA en mode IA vs IA   
-playIAvsIA(LVL1, LVL2) :-
-    Depth1 is LVL1*2,
-    Depth2 is LVL2*2,
-    playIAvsIA(LVL1, LVL2, Depth1, Depth2, [-1], [-1]). % à revoir
 playIAvsIA(LVL1, LVL2, Depth1, Depth2, P1, P2) :-
     board(B),
     alpha_beta(1, Depth1, B, -10000, 10000, Move, P1, Value), !,
@@ -149,7 +147,7 @@ playIAvsIA(LVL1, LVL2, Depth1, Depth2, P1, P2) :-
     board(NewB),
     print_board(1, LVL1, NewB),
     not(won),
-    alpha_beta(2, Depth2, NewB, -10000, 10000, Move2, P2, Value), !,
+    alpha_beta(2, Depth2, NewB, -10000, 10000, Move2, P2, Value2), !,
     save_move(2, Move2),
     board(NewB2),
     print_board(2, LVL2, NewB2),
@@ -205,9 +203,9 @@ won :-
     init_ui, !.
    
 % Donne le nom de la difficuté en fonction de son ID
-getDifficulty(0, 'Facile').
-getDifficulty(1, 'Moyen').
-getDifficulty(2, 'Difficile').
+getDifficulty(1, 'Facile').
+getDifficulty(2, 'Moyen').
+getDifficulty(3, 'Difficile').
 
 
 %Modification de l'élément voulu du plateau
@@ -218,17 +216,20 @@ modifyBoard(Val, I, [X|R1], [X|R2]) :-
     
 % Poser un pion (max 3)
 move(Plr, B, [-1, T, 0], NewB) :-
+    setP(Plr, B, T),
     modifyBoard(Plr, T, B, NewB).
     
 
 % Déplacer un pion (TE = case d'arrivé, TS = case de départ)
 move(Plr, B, [TS, TE, 1], NewB) :-
+    moveP(Plr, B, [TS, TE]),
     modifyBoard(0, TS, B, Temp),
     modifyBoard(Plr, TE, Temp, NewB).
 
 
 % Déplacer une case
 move(_, B, [TS, TE, 2], NewB) :-
+    moveT(B, [TS, TE]),
     modifyBoard(-1, TE, B, Temp),
     nth0(TE, B, Val),
     modifyBoard(Val, TS, Temp, NewB).
