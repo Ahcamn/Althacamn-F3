@@ -71,6 +71,7 @@ pts_value(3, 100).
 % Algorithme d'élagage alpha-beta, depth représentant la profondeur 
 % de l'algorithme et value le score évalué pour un plateau donné.
 alpha_beta(Plr, B, 0, _, _, _, Value) :-
+    writeln('Depth = 0'),!,
 	evaluation_board(B, Plr, Value).
 alpha_beta(Plr, B, _, _, _, _, 100) :-
 	evaluation_board(B, Plr, 100).
@@ -78,7 +79,10 @@ alpha_beta(Plr, B, _, _, _, _, -100) :-
 	evaluation_board(B, Plr, -100).
 alpha_beta(Plr, B, Depth, Alpha, Beta, Move, _) :-
 	findall(X, move(Plr, B, X, _), Moves), 
-	find_best(Plr, B, Depth, -Beta, -Alpha, Moves, Move).
+    Alpha1 is -Beta,
+    Beta1 is -Alpha,
+    write('alpha_beta / Depth = '), write(Depth), nl,
+	find_best(Plr, B, Depth, Alpha1, Beta1, Moves, Move).
 
 
 % find_best(+Plr, +B, +Depth, +Alpha, +Beta, +Moves, ?BestMove)
@@ -86,9 +90,11 @@ alpha_beta(Plr, B, Depth, Alpha, Beta, Move, _) :-
 find_best(_, _, _, _, _, [], _).	
 find_best(Plr, B, Depth, Alpha, Beta, [Move|RMoves], BestMove) :-
 	move(Plr, B, Move, NewB),
-	get_opponent(Plr, Opp),
-	alpha_beta(Opp, NewB, Depth-1, -Beta, -Alpha, Move, Value),
-	alpha_test(Plr, B, Depth, Alpha, Beta, [Move|RMoves], BestMove, -Value).
+    writeln('find_best'),
+    Depth1 is Depth-1,
+	alpha_beta(Opp, NewB, Depth1, Alpha, Beta, Move, Value),
+    Value1 is -Value,
+	alpha_test(Plr, B, Depth1, Alpha, Beta, [Move|RMoves], BestMove, Value1).
 	
 	
 % Effectue l'élagage de l'arbre en fonction d'alpha et beta (et de la valeur 
@@ -97,9 +103,12 @@ find_best(Plr, B, Depth, Alpha, Beta, [Move|RMoves], BestMove) :-
 % par le move actuel. Dans les autres cas on appelle juste find_best avec 
 % les mêmes paramètres qu avant. 
 alpha_test(_, _, _, Alpha, Beta, _, _, _):-
+    writeln('alpha_test 1'),
 	Alpha >= Beta.
 alpha_test(Plr, B, Depth, Alpha, Beta, [Move|RMoves], Move, Value):-
+    writeln('alpha_test 2'),
 	Value >= Alpha,
 	find_best(Plr, B, Depth, Value, Beta, RMoves, Move).
 alpha_test(Plr, B, Depth, Alpha, Beta, [_|RMoves], BestMove, _):-
+    writeln('alpha_test 3'),
 	find_best(Plr, B, Depth, Alpha, Beta, RMoves, BestMove).
