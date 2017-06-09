@@ -3,7 +3,7 @@
 % - column
 % - diagonal
 
-:- module(mod_regles_jeu, [win/2, empty2/3, is_move_allowed/3, numP/3, moveP/3, moveT/2, setP/3, get_opponent/2, row/3, column/3, diagonal/3]).
+:- module(mod_regles_jeu, [win/2, empty2/3, is_move_allowed/3, numP/3, moveP/3, moveT/2, setP/3, get_opponent/2, row/1, column/1, diagonal/1]).
 
 % Conditions de victoires
 % 3 pions sur une ligne
@@ -132,27 +132,14 @@ moveT(B, [TS, TE]) :-
 get_opponent(1, 2).
 get_opponent(2, 1).
 
-% ----------------- à refaire ------------------
 
-% Unifie la séquence [E1, E2, E3] avec la Ième ligne du plateau PL
-row(PL, I, [E1, E2, E3]) :-
-    I1 is (I - 1) * 3, nth0(I1, PL, E1),
-    I2 is 3 * I - 2, nth0(I2, PL, E2),
-    I3 is 3 * I - 1, nth0(I3, PL, E3).
+row([0,1,2]).
+row([3,4,5]).
+row([6,7,8]).
 
-% Unifie la séquence [E1, E2, E3] avec la Jème colonne du plateau PL
-column(PL, J, [E1, E2, E3]) :-
-    nth1(J, PL, E1),
-    I2 is J + 3, nth1(I2, PL, E2),
-    I3 is J + 6, nth1(I3, PL, E3).
+column([0,3,6]).
+column([1,4,7]).
+column([2,5,8]).
 
-% Unifie la séquence [E1, E2, E3] avec la Nème diagonale du plateau PL
-diagonal(PL, 1, [E1,E2,E3]) :-
-    !, nth1(1, PL, E1),
-    nth1(5, PL, E2),
-    nth1(9, PL, E3).
-
-diagonal(PL, 2, [E1,E2,E3]) :-
-    nth1(3, PL, E1),
-    nth1(5, PL, E2),
-    nth1(7, PL, E3).
+diagonal([0,4,8]).
+diagonal([2,4,6]).
