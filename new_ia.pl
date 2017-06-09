@@ -91,7 +91,10 @@ find_best(_, _, _, _, _, [], _).
 find_best(Plr, B, Depth, Alpha, Beta, [Move|RMoves], BestMove) :-
 	move(Plr, B, Move, NewB),
 	get_opponent(Plr, Opp),
-	writeln('find_best'),
+	writeln(NewB),
+    	write('Alpha : '), write(Alpha), nl,
+    	write('Beta : '), write(Beta), nl,
+	writeln('-----------'),
 	Depth1 is Depth-1,
 	alpha_beta(Opp, NewB, Depth1, Alpha, Beta, Move, Value),
 	Value1 is -Value,
