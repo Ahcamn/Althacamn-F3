@@ -1,5 +1,6 @@
 % TO DO :
 % - Bouger 2 cases
+% - Prise en compte du plateau précédent (pas refaire même move)
 
 :- module(mod_interface, [init_board/1, init_ui/0, scan_choice/1, start/1, move/4]).
 :- use_module('regles_jeu.pl').
@@ -34,7 +35,7 @@ start(1) :-
     playIAvsIA(LVL1, LVL2, Depth1, Depth2, [-1], [-1]).
 start(2) :-
     board(B),
-    playPvP(B, LVL, 1).
+    playPvP(B, 1).
 start(_) :- !.
 
 % Demande la difficulté de l'IA au joueur
@@ -68,7 +69,7 @@ play(B, LVL, 2) :-
     
 
 % Mode Joueur contre Joueur
-playPvP(OldB, LVL, Player) :-
+playPvP(OldB, Player) :-
     board(B),
     print_locations,
     nl, writef("Choisissez une action (Joueur %w) :",[Player]), nl,
@@ -82,7 +83,7 @@ playPvP(OldB, LVL, Player) :-
     print_board(Player, -1, NewB),
     not(won),
     get_opponent(Player, Opponent),
-    playPvP(B, LVL, Opponent).
+    playPvP(B, Opponent).
     
 % Tour du joueur
 playP(OldB, LVL, Player) :-
@@ -131,7 +132,7 @@ save_move(Player, Move) :-
 playIA(OldB, LVL, Player) :-
     board(B),
     Depth is LVL*2,
-    alpha_beta(Player, Depth, B, -10000, 10000, Move, OldB, Value), !,
+    alpha_beta(Player, B, Depth, -10000, 10000, Move, Value), !,
     save_move(Player, Move),
     board(NewB),
     print_board(Player, LVL, NewB),
@@ -142,12 +143,12 @@ playIA(OldB, LVL, Player) :-
 % Tour de l'IA en mode IA vs IA   
 playIAvsIA(LVL1, LVL2, Depth1, Depth2, P1, P2) :-
     board(B),
-    alpha_beta(1, Depth1, B, -10000, 10000, Move, P1, Value), !,
+    alpha_beta(1, B, Depth1, -10000, 10000, Move, Value), !,
     save_move(1, Move),
     board(NewB),
     print_board(1, LVL1, NewB),
     not(won),
-    alpha_beta(2, Depth2, NewB, -10000, 10000, Move2, P2, Value2), !,
+    alpha_beta(2, NewB, Depth2, -10000, 10000, Move2, Value2), !,
     save_move(2, Move2),
     board(NewB2),
     print_board(2, LVL2, NewB2),
