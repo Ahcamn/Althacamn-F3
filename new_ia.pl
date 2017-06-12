@@ -28,21 +28,21 @@ evaluation_board(B, Plr, Val) :-
 % evaluation_value(+Plr, +B, ?Val)
 % Retourne une valeur en fonction du plateau B correspondant aux "points" du joueur.
 evaluation_value(Plr, B, Val) :-
-	row(B, 1, R1), points(R1, Plr, B, PtsR1),
-	row(B, 2, R2), points(R2, Plr, B, PtsR2),
-	row(B, 3, R3), points(R3, Plr, B, PtsR3),
-	column(B, 1, C1), points(C1, Plr, B, PtsC1),
-	column(B, 2, C2), points(C2, Plr, B, PtsC2),
-	column(B, 3, C3), points(C3, Plr, B, PtsC3),
-	diagonal(B, 1, D1), points(D1, Plr, B, PtsD1),
-	diagonal(B, 2, D2), points(D2, Plr, B, PtsD2),
+	row(B, 1, R1), points(R1, Plr, PtsR1),
+	row(B, 2, R2), points(R2, Plr, PtsR2),
+	row(B, 3, R3), points(R3, Plr, PtsR3),
+	column(B, 1, C1), points(C1, Plr, PtsC1),
+	column(B, 2, C2), points(C2, Plr, PtsC2),
+	column(B, 3, C3), points(C3, Plr, PtsC3),
+	diagonal(B, 1, D1), points(D1, Plr, PtsD1),
+	diagonal(B, 2, D2), points(D2, Plr, PtsD2),
 	Val is PtsR1 + PtsR2 + PtsR3 + PtsC1 + PtsC2 + PtsC3 + PtsD1 + PtsD2.
 	
 	
 % points(+L, +Plr, +B, ?Pts)
 % Compte le nombre de pions du joueur Plr dans une liste et attribue des points
 % en fonction de ce nombre.
-points(L, Plr, B, Pts) :-
+points(L, Plr, Pts) :-
 	include(=:=(Plr), L, PPlr),
 	length(PPlr, X),
 	pts_value(X, Pts).
@@ -59,18 +59,17 @@ pts_value(3, 100).
 % alpha_beta(+Plr, +B, +Depth, +Alpha, +Beta, ?Move, ?Value)
 % Algorithme d'élagage alpha-beta, depth représentant la profondeur 
 % de l'algorithme et value le score évalué pour un plateau donné.
-alpha_beta(Plr, B, 0, Alpha, Beta, Move, Value) :-
+alpha_beta(Plr, B, 0, _, _, _, Value) :-
 	evaluation_board(B, Plr, Value).
 %alpha_beta(Plr, B, _, _, _, _, 100) :-
 %	evaluation_board(B, Plr, 100).
 %alpha_beta(Plr, B, _, _, _, _, -100) :-
 %	evaluation_board(B, Plr, -100).
-alpha_beta(Plr, B, Depth, Alpha, Beta, Move, Value) :-
+alpha_beta(Plr, B, Depth, Alpha, Beta, Move, _) :-
 	findall(X, move(Plr, B, X, _), Moves), 
-	%removeOldMove(OldMove, Moves),
 	Alpha1 is -Beta,
 	Beta1 is -Alpha,
-	%write('alpha_beta / Depth = '), write(Depth), nl,
+	write('alpha_beta / Depth = '), write(Depth), nl,
 	find_best(Plr, B, Depth, Alpha1, Beta1, Moves, Move).
 
 
@@ -79,10 +78,11 @@ alpha_beta(Plr, B, Depth, Alpha, Beta, Move, Value) :-
 find_best(Plr, B, Depth, Alpha, Beta, [Move|RMoves], BestMove) :-
 	move(Plr, B, Move, NewB),
 	get_opponent(Plr, Opp),
-	%writeln('-----------'),
-	%writeln(NewB),
-    %write('Alpha : '), write(Alpha), nl,
-    %write('Beta : '), write(Beta), nl,
+	writeln('-----------'),
+	writeln(NewB),
+    write('Depth : '), write(Depth), nl,
+    write('Alpha : '), write(Alpha), nl,
+    write('Beta : '), write(Beta), nl,
 	Depth1 is Depth-1,
 	alpha_beta(Opp, NewB, Depth1, Alpha, Beta, Move, Value),
 	Value1 is -Value,
@@ -94,15 +94,16 @@ find_best(Plr, B, Depth, Alpha, Beta, [Move|RMoves], BestMove) :-
 % par le move actuel. Dans les autres cas on appelle juste find_best avec 
 % les mêmes paramètres qu avant. 
 alpha_test(_, _, _, Alpha, Beta,_, _, _, _):-
-	Alpha >= Beta,!.
+	Alpha >= Beta, !.
 	
-alpha_test(Plr, B, Depth, Alpha, Beta, Move, [], Move, Value):-
-	Value >= Alpha,!.
-alpha_test(Plr, B, Depth, Alpha, Beta, _, [], BestMove, Value).
+alpha_test(_, _, _, Alpha, _, Move, [], Move, Value):-
+	Value >= Alpha, !.
+    
+alpha_test(_, _, _, _, _, _, [], _, _).
 	
 alpha_test(Plr, B, Depth, Alpha, Beta, Move, RMoves, Move, Value):-
-	Value >= Alpha,!,
+	Value >= Alpha, !,
 	find_best(Plr, B, Depth, Value, Beta, RMoves, Move).
 
-alpha_test(Plr, B, Depth, Alpha, Beta, _, RMoves, BestMove, Value):-
+alpha_test(Plr, B, Depth, Alpha, Beta, _, RMoves, BestMove, _):-
 	find_best(Plr, B, Depth, Alpha, Beta, RMoves, BestMove).
