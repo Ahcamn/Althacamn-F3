@@ -1,9 +1,4 @@
-% TO DO :
-% - row
-% - column
-% - diagonal
-
-:- module(mod_regles_jeu, [win/2, empty2/3, is_move_allowed/3, numP/3, moveP/3, moveT/2, setP/3, get_opponent/2, row/1, column/1, diagonal/1]).
+:- module(mod_regles_jeu, [win/2, empty2/3, is_move_allowed/3, numP/3, moveP/3, moveT/2, setP/3, get_opponent/2, row/3, column/3, diagonal/3]).
 
 % Conditions de victoires
 % 3 pions sur une ligne
@@ -133,13 +128,37 @@ get_opponent(1, 2).
 get_opponent(2, 1).
 
 
-row([0,1,2]).
-row([3,4,5]).
-row([6,7,8]).
+row(B, 1, [Y1, Y2, Y3]) :-
+	nth0(0, B, Y1),
+	nth0(1, B, Y2),
+	nth0(2, B, Y3).
+row(B, 2, [Y1, Y2, Y3]) :-
+	nth0(3, B, Y1),
+	nth0(4, B, Y2),
+	nth0(5, B, Y3).
+row(B, 3, [Y1, Y2, Y3]) :-
+	nth0(6, B, Y1),
+	nth0(7, B, Y2),
+	nth0(8, B, Y3).
 
-column([0,3,6]).
-column([1,4,7]).
-column([2,5,8]).
+column(B, 1, [Y1, Y2, Y3]) :-
+	nth0(0, B, Y1),
+	nth0(3, B, Y2),
+	nth0(6, B, Y3).
+column(B, 2, [Y1, Y2, Y3]) :-
+	nth0(1, B, Y1),
+	nth0(4, B, Y2),
+	nth0(7, B, Y3).
+column(B, 3, [Y1, Y2, Y3]) :-
+	nth0(2, B, Y1),
+	nth0(5, B, Y2),
+	nth0(8, B, Y3).
 
-diagonal([0,4,8]).
-diagonal([2,4,6]).
+diagonal(B, 1, [Y1, Y2, Y3]) :-
+	nth0(0, B, Y1),
+	nth0(4, B, Y2),
+	nth0(8, B, Y3).
+diagonal(B, 2, [Y1, Y2, Y3]) :-
+	nth0(2, B, Y1),
+	nth0(4, B, Y2),
+	nth0(6, B, Y3).
