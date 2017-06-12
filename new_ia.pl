@@ -39,7 +39,7 @@ evaluation_value(Plr, B, Val) :-
 	Val is PtsR1 + PtsR2 + PtsR3 + PtsC1 + PtsC2 + PtsC3 + PtsD1 + PtsD2.
 	
 	
-% points(+L, +Plr, +B, ?Pts)
+% points(+L, +Plr, ?Pts)
 % Compte le nombre de pions du joueur Plr dans une liste et attribue des points
 % en fonction de ce nombre.
 points(L, Plr, Pts) :-
@@ -56,25 +56,28 @@ pts_value(2, 10).
 pts_value(3, 100).
 
 
-% alpha_beta(+Plr, +B, +Depth, +Alpha, +Beta, ?Move, ?Value)
+% alpha_beta(+Plr, +B, +Depth, +Alpha, +Beta, ?BestMove, ?Value)
 % Algorithme d'élagage alpha-beta, depth représentant la profondeur 
 % de l'algorithme et value le score évalué pour un plateau donné.
 alpha_beta(Plr, B, 0, _, _, _, Value) :-
+    writeln('Depth = 0'),
 	evaluation_board(B, Plr, Value).
 %alpha_beta(Plr, B, _, _, _, _, 100) :-
 %	evaluation_board(B, Plr, 100).
 %alpha_beta(Plr, B, _, _, _, _, -100) :-
 %	evaluation_board(B, Plr, -100).
-alpha_beta(Plr, B, Depth, Alpha, Beta, Move, _) :-
+alpha_beta(Plr, B, Depth, Alpha, Beta, BestMove, _) :-
 	findall(X, move(Plr, B, X, _), Moves), 
 	Alpha1 is -Beta,
 	Beta1 is -Alpha,
+    Depth1 is Depth-1,
 	write('alpha_beta / Depth = '), write(Depth), nl,
-	find_best(Plr, B, Depth, Alpha1, Beta1, Moves, Move).
+	find_best(Plr, B, Depth1, Alpha1, Beta1, Moves, BestMove).
 
 
 % find_best(+Plr, +B, +Depth, +Alpha, +Beta, +Moves, ?BestMove)
 % Trouve le meilleur coup à jouer.	
+find_best(_, _, _, _, _, [], _) :- !.
 find_best(Plr, B, Depth, Alpha, Beta, [Move|RMoves], BestMove) :-
 	move(Plr, B, Move, NewB),
 	get_opponent(Plr, Opp),
@@ -83,8 +86,7 @@ find_best(Plr, B, Depth, Alpha, Beta, [Move|RMoves], BestMove) :-
     write('Depth : '), write(Depth), nl,
     write('Alpha : '), write(Alpha), nl,
     write('Beta : '), write(Beta), nl,
-	Depth1 is Depth-1,
-	alpha_beta(Opp, NewB, Depth1, Alpha, Beta, Move, Value),
+	alpha_beta(Opp, NewB, Depth, Alpha, Beta, Move, Value),
 	Value1 is -Value,
 	alpha_test(Plr, B, Depth, Alpha, Beta, Move, RMoves, BestMove, Value1).
 	
@@ -95,11 +97,6 @@ find_best(Plr, B, Depth, Alpha, Beta, [Move|RMoves], BestMove) :-
 % les mêmes paramètres qu avant. 
 alpha_test(_, _, _, Alpha, Beta,_, _, _, _):-
 	Alpha >= Beta, !.
-	
-alpha_test(_, _, _, Alpha, _, Move, [], Move, Value):-
-	Value >= Alpha, !.
-    
-alpha_test(_, _, _, _, _, _, [], _, _).
 	
 alpha_test(Plr, B, Depth, Alpha, Beta, Move, RMoves, Move, Value):-
 	Value >= Alpha, !,
