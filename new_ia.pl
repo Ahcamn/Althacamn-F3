@@ -1,3 +1,6 @@
+%TO DO:
+%	removeOldMove
+
 :- module(mod_ia, [evaluation_board/3, alpha_beta/7]).
 :- use_module('regles_jeu.pl').
 :- use_module('interface.pl').
@@ -64,6 +67,7 @@ alpha_beta(Plr, B, 0, Alpha, Beta, Move, Value) :-
 %	evaluation_board(B, Plr, -100).
 alpha_beta(Plr, B, Depth, Alpha, Beta, Move, Value) :-
 	findall(X, move(Plr, B, X, _), Moves), 
+	%removeOldMove(OldMove, Moves),
 	Alpha1 is -Beta,
 	Beta1 is -Alpha,
 	%write('alpha_beta / Depth = '), write(Depth), nl,
