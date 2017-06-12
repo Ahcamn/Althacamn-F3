@@ -32,7 +32,7 @@ start(1) :-
     level(LVL2),
     Depth1 is LVL1*2,
     Depth2 is LVL2*2,
-    playIAvsIA(LVL1, LVL2, Depth1, Depth2, [-1], [-1]).
+    playIAvsIA(LVL1, LVL2, Depth1, Depth2).
 start(2) :-
     board(B),
     playPvP(B, 1).
@@ -132,7 +132,7 @@ save_move(Player, Move) :-
 playIA(OldB, LVL, Player) :-
     board(B),
     Depth is LVL*2,
-    alpha_beta(Player, B, Depth, -10000, 10000, Move, Value), !,
+    alpha_beta(Player, B, Depth, -10000, 10000, Move, _), !,
     save_move(Player, Move),
     board(NewB),
     print_board(Player, LVL, NewB),
@@ -141,14 +141,14 @@ playIA(OldB, LVL, Player) :-
     playP(B, LVL, Opponent).
    
 % Tour de l'IA en mode IA vs IA   
-playIAvsIA(LVL1, LVL2, Depth1, Depth2, P1, P2) :-
+playIAvsIA(LVL1, LVL2, Depth1, Depth2) :-
     board(B),
-    alpha_beta(1, B, Depth1, -10000, 10000, Move, Value), !,
+    alpha_beta(1, B, Depth1, -10000, 10000, Move, _), !,
     save_move(1, Move),
     board(NewB),
     print_board(1, LVL1, NewB),
     not(won),
-    alpha_beta(2, NewB, Depth2, -10000, 10000, Move2, Value2), !,
+    alpha_beta(2, NewB, Depth2, -10000, 10000, Move2, _), !,
     save_move(2, Move2),
     board(NewB2),
     print_board(2, LVL2, NewB2),
