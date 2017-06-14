@@ -108,5 +108,4 @@ alpha_test(Plr, B, Depth, Alpha, Beta, Move, RMoves, _, _, Value) :-
 alpha_test(Plr, B, Depth, Alpha, Beta, _, RMoves, BestMove, BestValue, _):-
 	writeln('appel de find_best'),
 	find_best(Plr, B, Depth, Alpha, Beta, RMoves, BestMove, BestValue).
-	
-add_to_list(X, L, [X|L]).
+
