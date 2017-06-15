@@ -1,4 +1,4 @@
-:- module(mod_ia, [evaluation_board/3, alpha_beta/7]).
+:- module(mod_ia, [evaluation_board/3, min_max/4]).
 :- use_module('regles_jeu.pl').
 :- use_module('interface.pl').
 :- use_module(library(lists)).
@@ -53,59 +53,33 @@ pts_value(2, 10).
 pts_value(3, 100).
 
 
-% alpha_beta(+Plr, +B, +Depth, +Alpha, +Beta, ?Move, ?Value)
-% Algorithme d'élagage alpha-beta, depth représentant la profondeur 
-% de l'algorithme et value le score évalué pour un plateau donné.
-alpha_beta(Plr, B, 0, _, _, _, Value) :-
-    writeln('Depth = 0'),
-	evaluation_board(B, Plr, Value).
-%alpha_beta(Plr, B, _, _, _, _, 100) :-
-%	evaluation_board(B, Plr, 100).
-%alpha_beta(Plr, B, _, _, _, _, -100) :-
-%	evaluation_board(B, Plr, -100).
-alpha_beta(Plr, B, Depth, Alpha, Beta, Move, BestValue) :-
-	findall(X, move(Plr, B, X, _), Moves), 
-	Alpha1 is -Beta,
-	Beta1 is -Alpha,
-    Depth1 is Depth-1,
-	write('alpha_beta / Depth = '), write(Depth), nl,
-	find_best(Plr, B, Depth1, Alpha1, Beta1, Moves, BestMove, BestValue),
-	write('value dans alpha beta : '), write(BestValue), nl,
-	write('best move dans alpha beta : '), write(BestMove), nl.
+
+min_max(Plr, B, Depth, Move) :- min_max(Plr, B, Depth, _, Move).
+
+% min_max(+Plr, +B, +Depth, ?Value, ?Move) 
+% Algorithme Min Max, Depth représentant la profondeur de l'algorithme,
+% B le plateau de jeu, Value la meilleur valeur évaluée et Move le meilleur coup.
+min_max(Plr, B, 0, Value, _) :-
+    evaluation_board(B, Plr, Value),
+    write('eval : '), write(Value), nl.
+min_max(Plr, B, Depth, Value, Move) :-
+    Depth > 0,
+    Depth1 is Depth - 1,
+    findall(X, move(Plr, B, X, _), Moves),
+    write('min_max / Depth = '), write(Depth), nl,
+    writeln(Moves),
+    find_best(Plr, B, Depth1, Moves, -1000, nil, Value, Move),
+    write('min_max / Value = '), write(Value), write(' / Move = '), write(Move), nl.
 
 
-% find_best(+Plr, +B, +Depth, +Alpha, +Beta, +Moves, ?BestMove, ?BestValue)
-% Trouve le meilleur coup à jouer.	
-find_best(_, _, _, _, _, [], _, _) :- !.
-find_best(Plr, B, Depth, Alpha, Beta, [Move|RMoves], BestMove, BestValue) :-
-	move(Plr, B, Move, NewB),
-	get_opponent(Plr, Opp),
-	writeln('-----------'),
-	writeln(Move),
-	alpha_beta(Opp, NewB, Depth, Alpha, Beta, Move, Value),
-	write('Depth : '), write(Depth), nl,
-    write('Alpha : '), write(Alpha), nl,
-    write('Beta : '), write(Beta), nl,
-	Value1 is -Value,
-	write('Value : '), write(Value1), nl,
-	alpha_test(Plr, B, Depth, Alpha, Beta, Move, RMoves, BestMove, BestValue, Value1),
-	write('best value : '), write(BestValue), nl.
-	
-% Effectue l'élagage de l'arbre en fonction d'alpha et beta (et de la valeur 
-% de score obtenue). On arrête la recherche lorsque Alpha >= Beta, lorsque
-% Value >= Alpha on appelle find_best avec Alpha = Value et on remplace BestMove
-% par le move actuel. Dans les autres cas on appelle juste find_best avec 
-% les mêmes paramètres qu avant. 
-%alpha_test(_,_,_,_,_,_,[],_,_,_):- !, writeln('liste vide').
-
-alpha_test(_, _, _, Alpha, Beta,_, _, _, _, _):-
-	Alpha >= Beta, !, writeln('Alpha >= Beta').
-	
-alpha_test(Plr, B, Depth, Alpha, Beta, Move, RMoves, _, _, Value) :-
-	Value >= Alpha, !, writeln('Value >= Alpha, appel de find_best'),
-	find_best(Plr, B, Depth, Value, Beta, RMoves, Move, Value).
-
-alpha_test(Plr, B, Depth, Alpha, Beta, _, RMoves, BestMove, BestValue, _):-
-	writeln('appel de find_best'),
-	find_best(Plr, B, Depth, Alpha, Beta, RMoves, BestMove, BestValue).
-
+% find_best(+Plr, +B, +Depth, +Moves, +Value0, +Move0, ?BestValue, ?BestMove)
+% Trouve le meilleur coup à jouer.	 
+find_best(_, _, _, [], Value, BestMove, Value, BestMove).
+find_best(Plr, B, Depth, [Move|Moves], Value0, Move0, BestValue, BestMove) :-
+    move(Plr, B, Move, NewB),
+    get_opponent(Plr, Opp),
+    min_max(Opp, NewB, Depth, OppValue, _OppMove),
+    Value1 is -OppValue,
+    write('Depth = '), write(Depth), nl,
+    Value1 > Value0 -> find_best(Plr, B, Depth, Moves, Value1, Move, BestValue, BestMove); 
+    find_best(Plr, B, Depth, Moves, Value0, Move0, BestValue, BestMove).
