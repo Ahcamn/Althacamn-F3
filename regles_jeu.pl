@@ -1,4 +1,4 @@
-:- module(mod_regles_jeu, [win/2, empty2/3, numP/3, moveP/3, moveT/3, move2T/3, setP/3, get_opponent/2, row/3, column/3, diagonal/3]).
+:- module(mod_regles_jeu, [win/2, empty2/3, numP/3, moveP/3, moveT/2, move2T/4, setP/3, get_opponent/2, row/3, column/3, diagonal/3]).
 
 % Conditions de victoires
 % 3 pions sur une ligne
@@ -82,16 +82,12 @@ moveP(Plr, B, [TS, TE]) :-
     
 
 % Vérifie si la case vide peut être déplacée
-moveT(B, [PrevTS, PrevTE], [TS, TE]) :-
-    %PrevTS \= TE,
-    %PrevTE \= TS,
+moveT(B, [TS, TE]) :-
     empty(TS, TE),
     nth0(TS, B, -1).
 
-move2T(B, [PrevTS, PrevTE], [TS, TE]) :-
-    %PrevTS \= TE,
-    %PrevTE \= TS,
-    empty2(TS, TE),
+move2T(B, TS, TE, TI) :-
+    empty2(TS, TE, TI),
     nth0(TS, B, -1).
     
 
