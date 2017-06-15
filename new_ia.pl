@@ -60,16 +60,12 @@ min_max(Plr, B, Depth, Move) :- min_max(Plr, B, Depth, _, Move).
 % Algorithme Min Max, Depth représentant la profondeur de l'algorithme,
 % B le plateau de jeu, Value la meilleur valeur évaluée et Move le meilleur coup.
 min_max(Plr, B, 0, Value, _) :-
-    evaluation_board(B, Plr, Value),
-    write('eval : '), write(Value), nl.
+    evaluation_board(B, Plr, Value).
 min_max(Plr, B, Depth, Value, Move) :-
     Depth > 0,
     Depth1 is Depth - 1,
     findall(X, move(Plr, B, X, _), Moves),
-    write('min_max / Depth = '), write(Depth), nl,
-    writeln(Moves),
-    find_best(Plr, B, Depth1, Moves, -1000, nil, Value, Move),
-    write('min_max / Value = '), write(Value), write(' / Move = '), write(Move), nl.
+    find_best(Plr, B, Depth1, Moves, -1000, nil, Value, Move).
 
 
 % find_best(+Plr, +B, +Depth, +Moves, +Value0, +Move0, ?BestValue, ?BestMove)
@@ -80,6 +76,5 @@ find_best(Plr, B, Depth, [Move|Moves], Value0, Move0, BestValue, BestMove) :-
     get_opponent(Plr, Opp),
     min_max(Opp, NewB, Depth, OppValue, _OppMove),
     Value1 is -OppValue,
-    write('Depth = '), write(Depth), nl,
     Value1 > Value0 -> find_best(Plr, B, Depth, Moves, Value1, Move, BestValue, BestMove); 
     find_best(Plr, B, Depth, Moves, Value0, Move0, BestValue, BestMove).
