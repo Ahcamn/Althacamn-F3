@@ -1,6 +1,6 @@
 :- module(mod_interface, [init_board/1, init_ui/0, scan_choice/1, start/1, move/4]).
 :- use_module('regles_jeu.pl').
-:- use_module('new_ia.pl').
+:- use_module('ia.pl').
 
 % Permet de sauvegarder le plateau
 :- dynamic board/1.
