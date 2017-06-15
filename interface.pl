@@ -222,7 +222,7 @@ move(Plr, B, [-1, T, 0], NewB) :-
     
 
 % Déplacer un pion (TE = case d'arrivé, TS = case de départ)
-move(Plr, B, [TS, TE, P], NewB) :-
+move(Plr, B, [TS, TE, 1], NewB) :-
     moveP(Plr, B, [TS, TE]),
     modifyBoard(0, TS, B, Temp),
     modifyBoard(Plr, TE, Temp, NewB).
