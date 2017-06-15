@@ -72,7 +72,7 @@ playPvP(PrevMove, Plr) :-
     writeln('\t2. Déplacer la case vide'),
     writeln('\t3. Déplacer 2 fois la case vide'),
     scan_choice(C),
-    action(B, PrevMove, [TS, TE, C], Plr),
+    choice_action(B, PrevMove, [TS, TE, C], Plr),
     save_move(Plr, [TS, TE, C]),
     board(NewB),
     print_board(Plr, -1, NewB),
@@ -84,13 +84,7 @@ playPvP(PrevMove, Plr) :-
 playP(PrevMove, LVL, Plr) :-
     board(B),
     print_locations,
-    nl, writeln('Choisissez une action :'),
-    writeln('\t0. Poser un pion'),
-    writeln('\t1. Déplacer un pion'),
-    writeln('\t2. Déplacer la case vide'),
-    writeln('\t3. Déplacer 2 fois la case vide'),
-    scan_choice(C),
-    action(B, PrevMove, [TS, TE, C], Plr),
+    choice_action(B, PrevMove, [TS, TE, C], Plr),
     save_move(Plr, [TS, TE, C]),
     board(NewB),
     print_board(Plr, -1, NewB),
@@ -98,6 +92,15 @@ playP(PrevMove, LVL, Plr) :-
     get_opponent(Plr, Opponent),
     playIA([TS, TE, C], LVL, Opponent).
  
+choice_action(B, PrevMove, [TS, TE, C], Plr) :-
+    nl, writeln('Choisissez une action :'),
+    writeln('\t0. Poser un pion'),
+    writeln('\t1. Déplacer un pion'),
+    writeln('\t2. Déplacer la case vide'),
+    writeln('\t3. Déplacer 2 fois la case vide'),
+    scan_choice(C),
+    action(B, PrevMove, [TS, TE, C], Plr).
+    
 % Vérifie si l'action choisie peut être effecutée 
 action(B, _, [TS, TE, 0], Plr) :-
     TS is -1, 
@@ -121,9 +124,9 @@ action(B, [PrevTS, _, I], [TS, TE, 3], _) :-
     actionT(PrevTS, TE, I),
     move2T(B, TS, TE, _).
     
-action(B, PrevMove, [TS, TE, I], Plr) :-
+action(B, PrevMove, [TS, TE, _], Plr) :-
     nl, writeln('Erreur : Action impossible !'),
-    action(B, PrevMove, [TS, TE, I], Plr).
+    choice_action(B, PrevMove, [TS, TE, _], Plr).
   
 % Vérifie si le coup n'est pas le mouvement inverse du coup précédent 
 actionT(PrevTS, TE, I) :-
