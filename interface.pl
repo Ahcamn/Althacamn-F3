@@ -22,9 +22,9 @@ init_board([0, 0, 0, 0, -1, 0, 0, 0, 0]).
 start(0) :-
     writeln('Niveau de difficulté de l\'IA :'),
     level(LVL),
-    is_first(Player),
+    is_first(Plr),
     board(B),
-    play(B, LVL, Player).
+    play(B, LVL, Plr).
 start(1) :- 
     writeln('Niveau de difficulté de l\'IA 1 :'),
     level(LVL1),
@@ -51,16 +51,16 @@ level(LVL) :-
     level(LVL).
   
 % Demande au joueur si il veut commencer en 1er le jeu
-is_first(Player) :-
+is_first(Plr) :-
     nl, writeln('Voulez-vous commencer en 1er ?'),
     writeln('\t1. Oui'),
     writeln('\t2. Non'),
-    read(Player),
-    integer(Player),
-    between(1, 2, Player), !.
-is_first(Player) :-
+    read(Plr),
+    integer(Plr),
+    between(1, 2, Plr), !.
+is_first(Plr) :-
     writeln('Erreur : Le choix doit être 1 ou 2 !'),
-    is_first(Player).
+    is_first(Plr).
     
 play(B, LVL, 1) :-
     playP(B, LVL, 1).
@@ -69,24 +69,24 @@ play(B, LVL, 2) :-
     
 
 % Mode Joueur contre Joueur
-playPvP(OldB, Player) :-
+playPvP(OldB, Plr) :-
     board(B),
     print_locations,
-    nl, writef("Choisissez une action (Joueur %w) :",[Player]), nl,
+    nl, writef("Choisissez une action (Joueur %w) :",[Plr]), nl,
     writeln('\t0. Poser un pion'),
     writeln('\t1. Déplacer un pion'),
     writeln('\t2. Déplacer la case vide'),
     scan_choice(C),
-    action(B, [TS, TE, C], Player),
-    save_move(Player, [TS, TE, C]),
+    action(B, [TS, TE, C], Plr),
+    save_move(Plr, [TS, TE, C]),
     board(NewB),
-    print_board(Player, -1, NewB),
+    print_board(Plr, -1, NewB),
     not(won),
-    get_opponent(Player, Opponent),
+    get_opponent(Plr, Opponent),
     playPvP(B, Opponent).
     
 % Tour du joueur
-playP(OldB, LVL, Player) :-
+playP(OldB, LVL, Plr) :-
     board(B),
     print_locations,
     nl, writeln('Choisissez une action :'),
@@ -94,50 +94,50 @@ playP(OldB, LVL, Player) :-
     writeln('\t1. Déplacer un pion'),
     writeln('\t2. Déplacer la case vide'),
     scan_choice(C),
-    action(B, [TS, TE, C], Player),
-    save_move(Player, [TS, TE, C]),
+    action(B, [TS, TE, C], Plr),
+    save_move(Plr, [TS, TE, C]),
     board(NewB),
-    print_board(Player, -1, NewB),
+    print_board(Plr, -1, NewB),
     not(won),
-    get_opponent(Player, Opponent),
+    get_opponent(Plr, Opponent),
     playIA(B, LVL, Opponent).
  
 % Vérifie si l'action choisie peut être effecutée 
-action(B, [TS, TE, 0], Player) :-
+action(B, [TS, TE, 0], Plr) :-
     TS is -1, 
     scan_destination(TE),
-    setP(Player, B, TE), !.
+    setP(Plr, B, TE), !.
     
-action(B, [TS, TE, 1], Player) :-
+action(B, [TS, TE, 1], Plr) :-
     scan_origin(TS), 
     scan_destination(TE),
-    moveP(Player, B, [TS, TE]), !.
+    moveP(Plr, B, [TS, TE]), !.
     
 action(B, [TS, TE, 2], _) :-
     get_empty_tile(TS, B), 
     scan_destination(TE), 
     moveT(B, [-1,-1], [TS, TE]), !.
     
-action(B, [TS, TE, I], Player) :-
+action(B, [TS, TE, I], Plr) :-
     nl, writeln('Erreur : Action impossible !'),
-    action(B, [TS, TE, I], Player).
+    action(B, [TS, TE, I], Plr).
     
 % Sauvegarde le coup du joueur    
-save_move(Player, Move) :-
+save_move(Plr, Move) :-
     retract(board(B)),
-    move(Player, B, Move, B1),
+    move(Plr, B, Move, B1),
     assert(board(B1)).
 
 % Tour de l'IA
-playIA(OldB, LVL, Player) :-
+playIA(OldB, LVL, Plr) :-
     board(B),
     Depth is LVL*2,
     min_max(Plr, B, Depth, Move), !,
-    save_move(Player, Move),
+    save_move(Plr, Move),
     board(NewB),
-    print_board(Player, LVL, NewB),
+    print_board(Plr, LVL, NewB),
     not(won),
-    get_opponent(Player, Opponent),
+    get_opponent(Plr, Opponent),
     playP(B, LVL, Opponent).
    
 % Tour de l'IA en mode IA vs IA   
@@ -148,12 +148,12 @@ playIAvsIA(LVL1, LVL2, Depth1, Depth2) :-
     board(NewB),
     print_board(1, LVL1, NewB),
     not(won),
-    min_max(2, B, Depth2, Move2), !,
+    min_max(2, NewB, Depth2, Move2), !,
     save_move(2, Move2),
     board(NewB2),
     print_board(2, LVL2, NewB2),
     not(won),
-    playIAvsIA(LVL1, LVL2, Depth1, Depth2, B, NewB).
+    playIAvsIA(LVL1, LVL2, Depth1, Depth2).
 
 % Trouve la case vide sur le plateau 
 get_empty_tile(0, B) :- nth0(0, B, -1).
@@ -199,8 +199,8 @@ scan_destination(T) :-
 % Vérifie si un joueur à gagné la partie 
 won :-
     board(B),
-    win(Player, B),
-    writef("Le joueur %w a gagné !", [Player]),
+    win(Plr, B),
+    writef("Le joueur %w a gagné !", [Plr]),
     init_ui, !.
    
 % Donne le nom de la difficuté en fonction de son ID
@@ -212,7 +212,9 @@ getDifficulty(3, 'Difficile').
 %Modification de l'élément voulu du plateau
 modifyBoard(Val, 0, [_|R], [Val|R]) :- !.
 modifyBoard(Val, I, [X|R1], [X|R2]) :-
-    I > 0, I1 is I-1, modifyBoard(Val, I1, R1, R2), !.
+    I > 0, 
+    I1 is I-1, 
+    modifyBoard(Val, I1, R1, R2), !.
     
     
 % Poser un pion (max 3)
@@ -244,22 +246,22 @@ move(_, B, [TS, TE, 3], NewB) :-
     
 
 % Affiche le plateau de jeu
-print_board(Player, LVL, [T1, T2, T3, T4, T5, T6, T7, T8, T9]):-
+print_board(Plr, LVL, [T1, T2, T3, T4, T5, T6, T7, T8, T9]):-
     LVL \= -1, !,
     getDifficulty(LVL, Level),
     writeln('     _____'),
     write('    |'), token(T1), write(' '), token(T2), write(' '), token(T3), write('|'), nl,
     write('    |'), token(T4), write(' '), token(T5), write(' '), token(T6), write('|'),
-    write('\tPlayer '), write(Player), write(' (IA) '), write(Level), nl,
+    write('\tPlayer '), write(Plr), write(' (IA) '), write(Level), nl,
     write('    |'), token(T7), write(' '), token(T8), write(' '), token(T9), write('|'), nl,
     writeln('     -----'), nl.
 
-print_board(Player, -1, [T1, T2, T3, T4, T5, T6, T7, T8, T9]):-
+print_board(Plr, -1, [T1, T2, T3, T4, T5, T6, T7, T8, T9]):-
     !,
     writeln('     _____'),
     write('    |'), token(T1), write(' '), token(T2), write(' '), token(T3), write('|'), nl,
     write('    |'), token(T4), write(' '), token(T5), write(' '), token(T6), write('|'), 
-    write('\tPlayer '), write(Player), write(' (Joueur) '), nl,
+    write('\tPlayer '), write(Plr), write(' (Joueur) '), nl,
     write('    |'), token(T7), write(' '), token(T8), write(' '), token(T9), write('|'), nl,
     writeln('     -----'), nl.
     
