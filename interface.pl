@@ -1,6 +1,5 @@
 % TO DO :
 % - Bouger 2 cases
-% - Prise en compte du plateau précédent (pas refaire même move)
 
 :- module(mod_interface, [init_board/1, init_ui/0, scan_choice/1, start/1, move/4]).
 :- use_module('regles_jeu.pl').
@@ -23,8 +22,7 @@ start(0) :-
     writeln('Niveau de difficulté de l\'IA :'),
     level(LVL),
     is_first(Plr),
-    board(B),
-    play(B, LVL, Plr).
+    play(LVL, Plr).
 start(1) :- 
     writeln('Niveau de difficulté de l\'IA 1 :'),
     level(LVL1),
@@ -32,10 +30,9 @@ start(1) :-
     level(LVL2),
     Depth1 is LVL1*2,
     Depth2 is LVL2*2,
-    playIAvsIA(LVL1, LVL2, Depth1, Depth2).
+    playIAvsIA(LVL1, LVL2, Depth1, Depth2, [-1,-1,-1]).
 start(2) :-
-    board(B),
-    playPvP(B, 1).
+    playPvP([-1,-1,-1], 1).
 start(_) :- !.
 
 % Demande la difficulté de l'IA au joueur
@@ -62,65 +59,81 @@ is_first(Plr) :-
     writeln('Erreur : Le choix doit être 1 ou 2 !'),
     is_first(Plr).
     
-play(B, LVL, 1) :-
-    playP(B, LVL, 1).
-play(B, LVL, 2) :-
-    playIA(B, LVL, 2).
+play(LVL, 1) :-
+    playP([-1,-1,-1], LVL, 1).
+play(LVL, 2) :-
+    playIA([-1,-1,-1], LVL, 2).
     
 
 % Mode Joueur contre Joueur
-playPvP(OldB, Plr) :-
+playPvP(PrevMove, Plr) :-
     board(B),
     print_locations,
     nl, writef("Choisissez une action (Joueur %w) :",[Plr]), nl,
     writeln('\t0. Poser un pion'),
     writeln('\t1. Déplacer un pion'),
     writeln('\t2. Déplacer la case vide'),
+    writeln('\t3. Déplacer 2 fois la case vide'),
     scan_choice(C),
-    action(B, [TS, TE, C], Plr),
+    action(B, PrevMove, [TS, TE, C], Plr),
     save_move(Plr, [TS, TE, C]),
     board(NewB),
     print_board(Plr, -1, NewB),
     not(won),
     get_opponent(Plr, Opponent),
-    playPvP(B, Opponent).
+    playPvP([TS, TE, C], Opponent).
     
 % Tour du joueur
-playP(OldB, LVL, Plr) :-
+playP(PrevMove, LVL, Plr) :-
     board(B),
     print_locations,
     nl, writeln('Choisissez une action :'),
     writeln('\t0. Poser un pion'),
     writeln('\t1. Déplacer un pion'),
     writeln('\t2. Déplacer la case vide'),
+    writeln('\t3. Déplacer 2 fois la case vide'),
     scan_choice(C),
-    action(B, [TS, TE, C], Plr),
+    action(B, PrevMove, [TS, TE, C], Plr),
     save_move(Plr, [TS, TE, C]),
     board(NewB),
     print_board(Plr, -1, NewB),
     not(won),
     get_opponent(Plr, Opponent),
-    playIA(B, LVL, Opponent).
+    playIA([TS, TE, C], LVL, Opponent).
  
 % Vérifie si l'action choisie peut être effecutée 
-action(B, [TS, TE, 0], Plr) :-
+action(B, _, [TS, TE, 0], Plr) :-
     TS is -1, 
     scan_destination(TE),
     setP(Plr, B, TE), !.
     
-action(B, [TS, TE, 1], Plr) :-
+action(B, _, [TS, TE, 1], Plr) :-
     scan_origin(TS), 
     scan_destination(TE),
     moveP(Plr, B, [TS, TE]), !.
     
-action(B, [TS, TE, 2], _) :-
+action(B, [PrevTS, _, I], [TS, TE, 2], _) :-
     get_empty_tile(TS, B), 
     scan_destination(TE), 
-    moveT(B, [-1,-1], [TS, TE]), !.
+    actionT(PrevTS, TE, I),
+    moveT(B, [TS, TE]).
     
-action(B, [TS, TE, I], Plr) :-
+action(B, [PrevTS, _, I], [TS, TE, 3], _) :-
+    get_empty_tile(TS, B), 
+    scan_destination(TE), 
+    actionT(PrevTS, TE, I),
+    move2T(B, TS, TE, _).
+    
+action(B, PrevMove, [TS, TE, I], Plr) :-
     nl, writeln('Erreur : Action impossible !'),
-    action(B, [TS, TE, I], Plr).
+    action(B, PrevMove, [TS, TE, I], Plr).
+  
+
+actionT(PrevTS, TE, I) :-
+    between(2, 3, I),
+    PrevTS \= TE.
+actionT(_, _, I) :-    
+    I < 2.
     
 % Sauvegarde le coup du joueur    
 save_move(Plr, Move) :-
@@ -129,31 +142,31 @@ save_move(Plr, Move) :-
     assert(board(B1)).
 
 % Tour de l'IA
-playIA(OldB, LVL, Plr) :-
+playIA(PrevMove, LVL, Plr) :-
     board(B),
     Depth is LVL*2,
-    min_max(Plr, B, Depth, Move), !,
+    min_max(Plr, B, Depth, PrevMove, Move), !,
     save_move(Plr, Move),
     board(NewB),
     print_board(Plr, LVL, NewB),
     not(won),
     get_opponent(Plr, Opponent),
-    playP(B, LVL, Opponent).
+    playP(Move, LVL, Opponent).
    
 % Tour de l'IA en mode IA vs IA   
-playIAvsIA(LVL1, LVL2, Depth1, Depth2) :-
+playIAvsIA(LVL1, LVL2, Depth1, Depth2, PrevMove) :-
     board(B),
-    min_max(1, B, Depth1, Move), !,
+    min_max(1, B, Depth1, PrevMove, Move), !,
     save_move(1, Move),
     board(NewB),
     print_board(1, LVL1, NewB),
     not(won),
-    min_max(2, NewB, Depth2, Move2), !,
+    min_max(2, NewB, Depth2, Move, Move2), !,
     save_move(2, Move2),
     board(NewB2),
     print_board(2, LVL2, NewB2),
     not(won),
-    playIAvsIA(LVL1, LVL2, Depth1, Depth2).
+    playIAvsIA(LVL1, LVL2, Depth1, Depth2, Move2).
 
 % Trouve la case vide sur le plateau 
 get_empty_tile(0, B) :- nth0(0, B, -1).
@@ -232,7 +245,7 @@ move(Plr, B, [TS, TE, 1], NewB) :-
 
 % Déplacer une case
 move(_, B, [TS, TE, 2], NewB) :-
-    moveT(B, [-1, -1], [TS, TE]),
+    moveT(B, [TS, TE]),
     modifyBoard(-1, TE, B, Temp),
     nth0(TE, B, Val),
     modifyBoard(Val, TS, Temp, NewB).
@@ -240,7 +253,7 @@ move(_, B, [TS, TE, 2], NewB) :-
 
 % Déplacer deux cases
 move(_, B, [TS, TE, 3], NewB) :-
-    empty2(TS, TE, TI),
+    move2T(B, TS, TE, TI),
     move(_, B, [TS, TI, 2], Temp1),
     move(_, Temp1, [TI, TE, 2], NewB).
     
