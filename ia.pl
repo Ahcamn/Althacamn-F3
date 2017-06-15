@@ -1,106 +1,92 @@
-% TO DO
-% - eval
-% - alpha_beta
-% - élaguer
-
-:- module(mod_ia, [eval_bord/2, alpha_beta/8]).
+:- module(mod_ia, [evaluation_board/3, min_max/5]).
 :- use_module('regles_jeu.pl').
 :- use_module('interface.pl').
 :- use_module(library(lists)).
 
 
-% ----------------- à refaire -----------------
+% evaluation_board(+B, +Plr, ?Val)
+% Détermine qui est en train de gagner, les valeurs de 100 et -100
+% représentent respectivement une victoire et une défaite. 
+% Si une autre valeur est retournée, l'avantage sera déterminé en fonction 
+% du signe de Val (si positif avantage pour le joueur actuel, sinon pour
+% l'adversaire).
+evaluation_board(B, Plr, 100) :-
+	win(Plr, B),!.
+evaluation_board(B, Plr, -100) :-
+	get_opponent(Plr, Opp),
+	win(Opp, B),!.
+evaluation_board(B, Plr, Val) :- 
+	get_opponent(Plr, Opp),
+	evaluation_value(Plr, B, ValPlr),
+	evaluation_value(Opp, B, ValOpp),
+	Val is ValPlr - ValOpp.
 
-% eval_nb_move(+J, +P, ?NbM)
-% retourne le nombre de coup NbC du joueur J pour le plateau P
-eval_nb_move(J, P, NbM) :-
-    findall(_, deplacement(J, P, _), ListeMove),
-    length(ListeMove, NbM).
+	
+% evaluation_value(+Plr, +B, ?Val)
+% Retourne une valeur en fonction du plateau B correspondant aux "points" du joueur.
+evaluation_value(Plr, B, Val) :-
+	row(B, 1, R1), points(R1, Plr, PtsR1),
+	row(B, 2, R2), points(R2, Plr, PtsR2),
+	row(B, 3, R3), points(R3, Plr, PtsR3),
+	column(B, 1, C1), points(C1, Plr, PtsC1),
+	column(B, 2, C2), points(C2, Plr, PtsC2),
+	column(B, 3, C3), points(C3, Plr, PtsC3),
+	diagonal(B, 1, D1), points(D1, Plr, PtsD1),
+	diagonal(B, 2, D2), points(D2, Plr, PtsD2),
+	Val is PtsR1 + PtsR2 + PtsR3 + PtsC1 + PtsC2 + PtsC3 + PtsD1 + PtsD2.
+	
+	
+% points(+L, +Plr, ?Pts)
+% Compte le nombre de pions du joueur Plr dans une liste et attribue des points
+% en fonction de ce nombre.
+points(L, Plr, Pts) :-
+	include(=:=(Plr), L, PPlr),
+	length(PPlr, X),
+	pts_value(X, Pts).
 
+	
+% pts_value(+X, ?Pts)
+% Points attribués pour X pions alignés.	
+pts_value(0, 0).
+pts_value(1, 1).
+pts_value(2, 10).
+pts_value(3, 100).
 
-% eval_bord(+P, ?Value)
-% Permet de déterminer l'avantage d'un des deux joueurs.
-% Si la valeur de retour est positif, alors le joueur 1 à l'avantage. Et vise versa.
-% La valeur maximale est abs(100).
-eval_bord(P, 100) :-
-    win(1, P), !.
-eval_bord(P, -100) :-
-    win(2, P), !.
-eval_bord(P, V) :-
-    eval_value(1, P, ValueJ1),
-    eval_value(2, P, ValueJ2),
-    V is ValueJ1 - ValueJ2.
+delMove([], _, []).
+delMove([X|R1], X, R1) :- !.
+delMove([Y|R1], X, [Y|R3]) :- delMove(R1, X, R3).
 
+min_max(Plr, B, Depth, PrevMove, Move) :- min_max(Plr, B, Depth, _, PrevMove, Move).
 
-% eval_value(+J, +P, ?Value)
-% Retourne la valeur pour le joueur J
-eval_value(J, P, Value) :-
-    maplist(row(P), [1, 2, 3], Rows),
-    maplist(compute_points(J), Rows, PRows),
-    sumlist(PRows, PtsRows),
-    maplist(column(P), [1, 2, 3], Cols),
-    maplist(compute_points(J), Cols, PCols),
-    sumlist(PCols, PtsCols),
-    diagonal(P, 1, Prof1), compute_points(J, Prof1, PtsProf1),
-    diagonal(P, 2, Prof2), compute_points(J, Prof2, PtsProf2),
-    Value is PtsRows + PtsCols + PtsProf1 + PtsProf2.
-
-
-% compute_points(+J, +List, ?Score)
-% Distribut un score en fonction du nombre de pionts allignés.
-compute_points(J, List, Score) :-
-    include(=:=(J), List, Filtered),
-    length(Filtered, Len),
-    score(Len, Score).
-
-
-% score(+NbPions, ?score)
-% Retourne le score associé au nombre de pionts alignés.
-score(0, 0) :- !.
-score(1, 1) :- !.
-score(2, 5) :- !.
-score(3, 100).
-
-
-% alpha_beta(+J, +Depth, +P, +Alpha, +Beta, ?Move, +ForbidP, ?Value)
-% Algorithme d'élagage utilisant la méthode alpha-beta.
-% Depth est la profondeur de recherche avec Value la valeur du plateau
-% lorsque le coup est joué.
-alpha_beta(_J, 0, P, _Alpha, _Beta, _Move, _ForbidP, Value) :-
-    !, eval_bord(P, Value).
-
-alpha_beta(J, Depth, P, Alpha, Beta, Move, P, Value) :-
-    !, findall(X, move(J, P, X, _), Moves),
-    Alpha1 is -Beta, % max/min
-    Beta1 is -Alpha,
-    find_best(J, Moves, P, Depth, Alpha1, Beta1, nil, P, (Move, Value)).
-
-alpha_beta(J, Depth, P, Alpha, Beta, Move, ForbidP, Value) :-
-    findall(X, move(J, P, X, _), Moves),
-    Alpha1 is -Beta, % max/min
-    Beta1 is -Alpha,
+% min_max(+Plr, +B, +Depth, ?Value, ?Move) 
+% Algorithme Min Max, Depth représentant la profondeur de l'algorithme,
+% B le plateau de jeu, Value la meilleur valeur évaluée et Move le meilleur coup.
+min_max(Plr, B,  0, Value, _, _) :-
+    evaluation_board(B, Plr, Value).
+min_max(Plr, B, Depth, Value, PrevMove, Move) :-
+    Depth > 0,
     Depth1 is Depth - 1,
-    find_best(J, Moves, P, Depth1, Alpha1, Beta1, nil, ForbidP, (Move, Value)).
-
-% find_best(+J,+Moves,+P,+Depth,+Alpha,+Beta,+R,?BestMove)
-% Retourne le meilleur coup à jouer.
-find_best(_J, [], _P, _Depth, Alpha, _Beta, Move, _, (Move,Alpha)) :- !.
-find_best(J, [Move|Moves], P, Depth, Alpha, Beta, R, ForbidP, BestMove) :-
-    move(J, P, Move, NP),
-    get_opponent(J, OtherJR),
-    alpha_beta(OtherJR, Depth, NP, Alpha, Beta, _OtherCoup, ForbidP, Value),
-    Value1 is -Value,
-    pruning(J,Move, ForbidP, Value1,Depth,Alpha,Beta,Moves,P,R,BestMove).
+    findall(X, move(Plr, B, X, _), Moves),
+    find_best(Plr, B, Depth1, Value, PrevMove, Move, Moves).
 
 
-% pruning(+J,+Move,+Value,+Depth,+Alpha,+Beta,+Moves,+P,+_R,+BestMove)
-% Permet d'élaguer l'abre de recherche en fonction d'alpha et beta.
-% La recherche s'arrête dans une branche lorsqu'elle sort des bornes.
-pruning(J,Move, ForbidP, Value,Depth,Alpha,Beta,Moves,P,_R,BestMove) :-
-    Alpha < Value,
-    Value < Beta, !,
-    find_best(J,Moves,P,Depth,Value,Beta,Move, ForbidP, BestMove).
-pruning(J,_Move, ForbidP, Value,Depth,Alpha,Beta,Moves,P,R,BestMove) :-
-    Value =< Alpha, !,
-    find_best(J,Moves,P,Depth,Alpha,Beta,R, ForbidP, BestMove).
-pruning(_J, Move, _, Value, _Depth, _Alpha, _Beta, _Moves, _P, _R, (Move, Value)).
+find_best(Plr, B, Depth, Value, [TS, TE, I], Move, Moves) :-  
+    between(2,3,I),
+    delMove(Moves, [TE, TS, I], NewMoves),
+    find_best(Plr, B, Depth, NewMoves, -1000, nil, Value, [TS, TE, 2], Move), !.
+    
+find_best(Plr, B, Depth, Value, PrevMove, Move, Moves) :-
+    find_best(Plr, B, Depth, Moves, -1000, nil, Value, PrevMove, Move).
+    
+
+
+% find_best(+Plr, +B, +Depth, +Moves, +Value0, +Move0, ?BestValue, +PrevMove, ?BestMove)
+% Trouve le meilleur coup à jouer.	 
+find_best(_, _, _, [], Value, BestMove, Value, _, BestMove).
+find_best(Plr, B, Depth, [Move|Moves], Value0, Move0, BestValue, PrevMove, BestMove) :-
+    move(Plr, B, Move, NewB),
+    get_opponent(Plr, Opp),
+    min_max(Opp, NewB, Depth, OppValue, PrevMove, _OppMove),
+    Value1 is -OppValue,
+    Value1 > Value0 -> find_best(Plr, B, Depth, Moves, Value1, Move, BestValue, PrevMove, BestMove); 
+    find_best(Plr, B, Depth, Moves, Value0, Move0, BestValue, PrevMove, BestMove).
