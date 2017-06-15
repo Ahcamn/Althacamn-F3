@@ -4,7 +4,7 @@
 
 :- module(mod_interface, [init_board/1, init_ui/0, scan_choice/1, start/1, move/4]).
 :- use_module('regles_jeu.pl').
-:- use_module('ia.pl').
+:- use_module('new_ia.pl').
 
 % Permet de sauvegarder le plateau
 :- dynamic board/1.
@@ -116,7 +116,7 @@ action(B, [TS, TE, 1], Player) :-
 action(B, [TS, TE, 2], _) :-
     get_empty_tile(TS, B), 
     scan_destination(TE), 
-    moveT(B, [TS, TE]), !.
+    moveT(B, [-1,-1], [TS, TE]), !.
     
 action(B, [TS, TE, I], Player) :-
     nl, writeln('Erreur : Action impossible !'),
@@ -132,7 +132,7 @@ save_move(Player, Move) :-
 playIA(OldB, LVL, Player) :-
     board(B),
     Depth is LVL*2,
-    alpha_beta(Player, B, Depth, -10000, 10000, Move, _), !,
+    min_max(Plr, B, Depth, Move), !,
     save_move(Player, Move),
     board(NewB),
     print_board(Player, LVL, NewB),
@@ -143,12 +143,12 @@ playIA(OldB, LVL, Player) :-
 % Tour de l'IA en mode IA vs IA   
 playIAvsIA(LVL1, LVL2, Depth1, Depth2) :-
     board(B),
-    alpha_beta(1, B, Depth1, -10000, 10000, Move, _), !,
+    min_max(1, B, Depth1, Move), !,
     save_move(1, Move),
     board(NewB),
     print_board(1, LVL1, NewB),
     not(won),
-    alpha_beta(2, NewB, Depth2, -10000, 10000, Move2, _), !,
+    min_max(2, B, Depth2, Move2), !,
     save_move(2, Move2),
     board(NewB2),
     print_board(2, LVL2, NewB2),
@@ -222,7 +222,7 @@ move(Plr, B, [-1, T, 0], NewB) :-
     
 
 % Déplacer un pion (TE = case d'arrivé, TS = case de départ)
-move(Plr, B, [TS, TE, 1], NewB) :-
+move(Plr, B, [TS, TE, P], NewB) :-
     moveP(Plr, B, [TS, TE]),
     modifyBoard(0, TS, B, Temp),
     modifyBoard(Plr, TE, Temp, NewB).
@@ -230,7 +230,7 @@ move(Plr, B, [TS, TE, 1], NewB) :-
 
 % Déplacer une case
 move(_, B, [TS, TE, 2], NewB) :-
-    moveT(B, [TS, TE]),
+    moveT(B, [-1, -1], [TS, TE]),
     modifyBoard(-1, TE, B, Temp),
     nth0(TE, B, Val),
     modifyBoard(Val, TS, Temp, NewB).
