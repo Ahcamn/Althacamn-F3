@@ -1,9 +1,6 @@
-% TO DO :
-% - Bouger 2 cases
-
 :- module(mod_interface, [init_board/1, init_ui/0, scan_choice/1, start/1, move/4]).
 :- use_module('regles_jeu.pl').
-:- use_module('ia.pl').
+:- use_module('new_ia.pl').
 
 % Permet de sauvegarder le plateau
 :- dynamic board/1.
@@ -128,7 +125,7 @@ action(B, PrevMove, [TS, TE, I], Plr) :-
     nl, writeln('Erreur : Action impossible !'),
     action(B, PrevMove, [TS, TE, I], Plr).
   
-
+% Vérifie si le coup n'est pas le mouvement inverse du coup précédent 
 actionT(PrevTS, TE, I) :-
     between(2, 3, I),
     PrevTS \= TE.
