@@ -1,4 +1,4 @@
-:- module(mod_regles_jeu, [win/2, empty2/3, is_move_allowed/3, numP/3, moveP/3, moveT/2, setP/3, get_opponent/2, row/3, column/3, diagonal/3]).
+:- module(mod_regles_jeu, [win/2, empty2/3, numP/3, moveP/3, moveT/3, move2T/3, setP/3, get_opponent/2, row/3, column/3, diagonal/3]).
 
 % Conditions de victoires
 % 3 pions sur une ligne
@@ -56,39 +56,6 @@ empty2(2, 0, 1).
 empty2(6, 8, 7).
 empty2(8, 6, 7).
 
-% Permet de savoir si le déplacement de case choisi est possible
-is_move_allowed(0, T, 2) :-
-    member(T, [1, 3]).
-is_move_allowed(1, T, 2) :-
-    member(T, [0, 2, 4]).
-is_move_allowed(2, T, 2) :-
-    member(T, [1, 5]).
-is_move_allowed(3, T, 2) :-
-    member(T, [0, 4, 6]).
-is_move_allowed(4, T, 2) :-
-    member(T, [1, 5, 7, 3]).
-is_move_allowed(5, T, 2) :-
-    member(T, [2, 8, 4]).
-is_move_allowed(6, T, 2) :-
-    member(T, [3, 7]).
-is_move_allowed(7, T, 2) :-
-    member(T, [4, 8, 6]).
-is_move_allowed(8, T, 2) :-
-    member(T, [5, 7]).
-
-is_move_allowed(0, T, 3) :-
-    member(T, [6, 2]).
-is_move_allowed(1, 7, 3).
-is_move_allowed(2, T, 3) :-
-    member(T, [0, 8]).
-is_move_allowed(3, 5, 3).
-is_move_allowed(5, 3, 3).
-is_move_allowed(6, T, 3) :-
-    member(T, [0, 8]).
-is_move_allowed(7, 1, 3).
-is_move_allowed(8, T, 3) :-
-    member(T, [2, 6]).
-
 % Nombre de pions placés pas le joueur (Plr)
 numP(Plr, B, N) :- 
     sublist(=(Plr), B, L), 
@@ -109,17 +76,22 @@ setP(Plr, [T0, T1, T2, T3, T4, T5, T6, T7, 0|R], 8) :- numP(Plr, [T0, T1, T2, T3
   
 % Vérifie si le pion peut être bougé
 moveP(Plr, B, [TS, TE]) :-
-    !, 
-    is_move_allowed(TE, TS, 2),
+    empty(TS, TE),
     nth0(TS, B, Plr), 
     nth0(TE, B, 0).
     
 
 % Vérifie si la case vide peut être déplacée
-moveT(B, [TS, TE]) :-
-    !, 
-    empty(TS, TE), 
-    is_move_allowed(TE, TS, 2),
+moveT(B, [PrevTS, PrevTE], [TS, TE]) :-
+    %PrevTS \= TE,
+    %PrevTE \= TS,
+    empty(TS, TE),
+    nth0(TS, B, -1).
+
+move2T(B, [PrevTS, PrevTE], [TS, TE]) :-
+    %PrevTS \= TE,
+    %PrevTE \= TS,
+    empty2(TS, TE),
     nth0(TS, B, -1).
     
 
