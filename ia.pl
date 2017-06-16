@@ -52,19 +52,21 @@ pts_value(1, 1).
 pts_value(2, 10).
 pts_value(3, 100).
 
+% devMove(+Moves, +Move, ?NewMoves)
+% Renvoi NewMoves qui correspond à la liste Moves sans l'élément Move
 delMove([], _, []).
 delMove([X|R1], X, R1) :- !.
 delMove([Y|R1], X, [Y|R3]) :- delMove(R1, X, R3).
 
-min_max(Plr, B, Depth, PrevMove, Move) :- min_max(Plr, B, Depth, _, PrevMove, Move).
+min_max(Plr, B, Depth, PrevMove, Move) :- 
+    min_max(Plr, B, Depth, Value, PrevMove, Move).
 
 % min_max(+Plr, +B, +Depth, ?Value, ?Move) 
 % Algorithme Min Max, Depth représentant la profondeur de l'algorithme,
 % B le plateau de jeu, Value la meilleur valeur évaluée et Move le meilleur coup.
 min_max(Plr, B,  0, Value, _, _) :-
-    evaluation_board(B, Plr, Value).
+    !, evaluation_board(B, Plr, Value).
 min_max(Plr, B, Depth, Value, PrevMove, Move) :-
-    Depth > 0,
     Depth1 is Depth - 1,
     findall(X, move(Plr, B, X, _), Moves),
     find_best(Plr, B, Depth1, Value, PrevMove, Move, Moves).
@@ -82,11 +84,11 @@ find_best(Plr, B, Depth, Value, PrevMove, Move, Moves) :-
 
 % find_best(+Plr, +B, +Depth, +Moves, +Value0, +Move0, ?BestValue, +PrevMove, ?BestMove)
 % Trouve le meilleur coup à jouer.	 
-find_best(_, _, _, [], Value, BestMove, Value, _, BestMove).
+find_best(_, _, _, [], Value, Move, Value, _, Move).
 find_best(Plr, B, Depth, [Move|Moves], Value0, Move0, BestValue, PrevMove, BestMove) :-
     move(Plr, B, Move, NewB),
     get_opponent(Plr, Opp),
     min_max(Opp, NewB, Depth, OppValue, PrevMove, _OppMove),
-    Value1 is -OppValue,
-    Value1 > Value0 -> find_best(Plr, B, Depth, Moves, Value1, Move, BestValue, PrevMove, BestMove); 
+    Value is -OppValue,
+    Value > Value0 -> find_best(Plr, B, Depth, Moves, Value, Move, BestValue, PrevMove, BestMove); 
     find_best(Plr, B, Depth, Moves, Value0, Move0, BestValue, PrevMove, BestMove).
