@@ -25,8 +25,8 @@ start(1) :-
     level(LVL1),
     writeln('Niveau de difficulté de l\'IA 2 :'),
     level(LVL2),
-    Depth1 is LVL1*2,
-    Depth2 is LVL2*2,
+    Depth1 is (LVL1*2) - 1,
+    Depth2 is (LVL2*2) - 1,
     playIAvsIA(LVL1, LVL2, Depth1, Depth2, [-1,-1,-1]).
 start(2) :-
     playPvP([-1,-1,-1], 1).
@@ -144,7 +144,7 @@ save_move(Plr, Move) :-
 % Tour de l'IA
 playIA(PrevMove, LVL, Plr) :-
     board(B),
-    Depth is LVL*2,
+    Depth is (LVL*2) - 1,
     min_max(Plr, B, Depth, PrevMove, Move), !,
     save_move(Plr, Move),
     board(NewB),
