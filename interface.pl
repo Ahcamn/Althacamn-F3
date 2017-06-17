@@ -229,29 +229,28 @@ modifyBoard(Val, I, [X|R1], [X|R2]) :-
     I1 is I-1, 
     modifyBoard(Val, I1, R1, R2), !.
     
-    
-% Poser un pion (max 3)
+% move(+Plr, +B, +Move, ?NewB)
+% Plr correspond au joueur voulant effectuer le déplacement, B
+% est le plateau actuel, Move est un tableau contenant les caractéristiques 
+% du déplacement, il est composé sous la forme [TS, TE, I], TS correspondant 
+% à la case de départ, TE correspondant à la case d'arrivée, et I 
+% correspondant au code d'identification du déplacement (0, 1, 2 ou 3).
+% move pour I=0 : Poser un pion (max 3)
 move(Plr, B, [-1, T, 0], NewB) :-
     setP(Plr, B, T),
-    modifyBoard(Plr, T, B, NewB).
-    
-
-% Déplacer un pion (TE = case d'arrivé, TS = case de départ)
+    modifyBoard(Plr, T, B, NewB).   
+% move pour I=1 : Déplacer un pion (TE = case d'arrivé, TS = case de départ)
 move(Plr, B, [TS, TE, 1], NewB) :-
     moveP(Plr, B, [TS, TE]),
     modifyBoard(0, TS, B, Temp),
     modifyBoard(Plr, TE, Temp, NewB).
-
-
-% Déplacer une case
+% move pour I=2 : Déplacer une case
 move(_, B, [TS, TE, 2], NewB) :-
     moveT(B, [TS, TE]),
     modifyBoard(-1, TE, B, Temp),
     nth0(TE, B, Val),
     modifyBoard(Val, TS, Temp, NewB).
-
-
-% Déplacer deux cases
+% move pour I=3 : Déplacer deux cases
 move(_, B, [TS, TE, 3], NewB) :-
     move2T(B, TS, TE, TI),
     move(_, B, [TS, TI, 2], Temp1),
