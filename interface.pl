@@ -80,7 +80,15 @@ playPvP(PrevMove, Plr) :-
     get_opponent(Plr, Opponent),
     playPvP([TS, TE, C], Opponent).
     
-% Tour du joueur
+% playP(+PrevMove, +Lvl, +Plr)
+% Effectue le tour du joueur
+% PrevMove correspond au tour précédent, qui est utilisé pour vérifié qu'on 
+% ne redéplace pas la case vide dans sa position précédente si elle a 
+% été déplacée, Lvl correspond au niveau de l'IA et Plr correspond au joueur.
+% choice_action/4 affiche un menu qui permet au joueur de choisir ce qu'il veut 
+% faire, save_move/2 permet de sauvegarder le déplacement effectué par le joueur
+% sur le plateau. print_board/3 permet d'afficher le nouveau plateau afin de voir 
+% l'état actuel et playIA/3 lance le tour de l'IA
 playP(PrevMove, LVL, Plr) :-
     board(B),
     print_locations,
@@ -141,7 +149,10 @@ save_move(Plr, Move) :-
     move(Plr, B, Move, B1),
     assert(board(B1)).
 
-% Tour de l'IA
+% playIA(+PrevMove, +Lvl, +Plr)
+% Effectue le tour de l'IA, même chose que pour PlayP/3 sauf qu'on
+% fait appel à min_max/5 plutôt que choice_action/4 et on lance ensuite
+% le tour du joueur.
 playIA(PrevMove, LVL, Plr) :-
     board(B),
     Depth is (LVL*2) - 1,
